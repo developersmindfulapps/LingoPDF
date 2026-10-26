@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 160" fill="none">
+  <!-- LingoPDF Emblem (Left) - Reversed -->
+  <g transform="translate(10, 0)">
+    <!-- Left open book page / wing -->
+    <path d="M 80 148 C 76 138 52 125 24 125 C 22.5 125 22 124 22 122.5 L 22 84 C 22 83 23 82.5 24 83 C 44 91 66 102 78 128 C 79 130 80 133 80 148 Z" fill="#FFFFFF" />
+    <path d="M 23 128 C 42 128 65 137 78 152 C 77 140 60 131 42 128 L 23 128 Z" fill="#FFFFFF" />
+
+    <!-- Right open book page / wing -->
+    <path d="M 80 148 C 84 138 108 125 136 125 C 137.5 125 138 124 138 122.5 L 138 84 C 138 83 137 82.5 136 83 C 116 91 94 102 82 128 C 81 130 80 133 80 148 Z" fill="#FFFFFF" />
+    <path d="M 137 128 C 118 128 95 137 82 152 C 83 140 100 131 118 128 L 137 128 Z" fill="#FFFFFF" />
+
+    <!-- Main center-left leaf -->
+    <path d="M 80 146 C 76 120 64 78 82 28 C 98 62 108 84 94 116 C 88 128 83 138 80 146 Z" fill="#FFFFFF" />
+
+    <!-- Left outer curved leaf blade -->
+    <path d="M 80 146 C 74 130 52 102 26 80 C 44 80 64 96 76 122 Z" fill="#FFFFFF" />
+
+    <!-- Terracotta accent leaf -->
+    <path d="M 86 112 C 92 94 108 72 124 60 C 128 76 114 96 92 110 C 89 111 87 112 86 112 Z" fill="#D87854" />
+
+    <!-- Center sprout line / stem -->
+    <path d="M 80 152 L 80 120 C 80 105 84 90 88 75" stroke="#193C32" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+
+  <!-- LingoPDF Wordmark (Right) -->
+  <g transform="translate(180, 0)">
+    <text x="0" y="102" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="78" letter-spacing="-1.5">
+      <tspan fill="#FFFFFF">Lingo</tspan><tspan fill="#D87854">PDF</tspan>
+    </text>
+    <text x="4" y="132" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-weight="600" font-size="14" fill="#FFFFFF" letter-spacing="6.5" opacity="0.85">
+      READ  ·  UNDERSTAND  ·  GO FURTHER
+    </text>
+  </g>
+</svg>
