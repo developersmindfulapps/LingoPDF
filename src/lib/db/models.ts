@@ -9,10 +9,13 @@ export interface UserDocument {
   name?: string;
   status: AccountStatus;
   isEmailVerified: boolean;
+  emailVerificationTokenHash?: string; // SHA-256 hash of single-use verification token
+  emailVerificationExpires?: Date; // 24-hour expiry
+  passwordResetTokenHash?: string; // SHA-256 hash of single-use password reset token
+  passwordResetExpires?: Date; // 1-hour expiry
+  // Legacy fields retained for backwards compatibility
   emailVerificationToken?: string;
-  emailVerificationExpires?: Date;
   passwordResetToken?: string;
-  passwordResetExpires?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -44,6 +47,16 @@ export async function ensureIndexes(db: Db): Promise<void> {
   await Promise.all([
     // Unique lowercase email index
     usersCollection.createIndex({ email: 1 }, { unique: true }),
+    // Sparse index on email verification token hash
+    usersCollection.createIndex(
+      { emailVerificationTokenHash: 1 },
+      { unique: true, sparse: true }
+    ),
+    // Sparse index on password reset token hash
+    usersCollection.createIndex(
+      { passwordResetTokenHash: 1 },
+      { unique: true, sparse: true }
+    ),
     // Lookup by user in sessions
     sessionsCollection.createIndex({ userId: 1 }),
     // Unique index on tokenHash

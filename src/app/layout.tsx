@@ -14,10 +14,24 @@ const inter = Inter({
   display: "swap",
 });
 
+const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lingopdf.in";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(appBaseUrl),
   title: "LingoPDF — German-to-English PDF Word Translation Extension",
   description:
     "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "LingoPDF — German-to-English PDF Word Translation Extension",
+    description:
+      "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
+    url: "https://lingopdf.in",
+    siteName: "LingoPDF",
+    type: "website",
+  },
   icons: {
     icon: [
       { url: "/images/lingopdf-emblem.svg", type: "image/svg+xml" },

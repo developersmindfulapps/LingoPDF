@@ -5,6 +5,8 @@ import { getSessionsCollection, getUsersCollection, UserDocument } from "@/lib/d
 
 export const SESSION_COOKIE_NAME = "lingopdf_session";
 export const SESSION_EXPIRATION_DAYS = 30;
+export const VERIFICATION_EXPIRATION_HOURS = 24;
+export const PASSWORD_RESET_EXPIRATION_HOURS = 1;
 
 /**
  * Hashes a plaintext password using Argon2id with recommended security parameters.
@@ -30,10 +32,21 @@ export async function verifyPassword(hash: string, plaintext: string): Promise<b
 }
 
 /**
- * Computes a SHA-256 hash of a session token for secure database storage.
+ * Computes a SHA-256 hash of a token for secure database storage.
  */
 export function hashToken(token: string): string {
   return crypto.createHash("sha256").update(token).digest("hex");
+}
+
+/**
+ * Constant-time comparison of two hex hashes.
+ */
+export function timingSafeHashMatch(a: string, b: string): boolean {
+  if (typeof a !== "string" || typeof b !== "string") return false;
+  const bufA = Buffer.from(a, "hex");
+  const bufB = Buffer.from(b, "hex");
+  if (bufA.length !== bufB.length) return false;
+  return crypto.timingSafeEqual(bufA, bufB);
 }
 
 /**
@@ -127,7 +140,7 @@ export async function revokeSession(db: Db, token: string): Promise<boolean> {
 }
 
 /**
- * Revokes all sessions for a specific user (e.g. on password change).
+ * Revokes all sessions for a specific user (e.g. on password change or reset).
  */
 export async function revokeAllUserSessions(db: Db, userId: ObjectId): Promise<number> {
   const sessions = await getSessionsCollection(db);

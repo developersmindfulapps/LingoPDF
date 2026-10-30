@@ -112,6 +112,12 @@ export function LoginForm() {
           >
             Password
           </label>
+          <Link
+            href="/forgot-password"
+            className="text-xs text-[var(--color-charcoal)]/70 hover:text-[var(--color-forest-green)] hover:underline focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-forest-green)] rounded"
+          >
+            Forgot password?
+          </Link>
         </div>
         <div className="relative">
           <input
@@ -163,6 +169,16 @@ export function LoginForm() {
           <span>Sign In</span>
         )}
       </button>
+
+      {/* Verification notice & resend shortcut */}
+      <div className="rounded-xl border border-[var(--color-soft-sage)] bg-[var(--color-warm-ivory)]/40 p-3 text-center">
+        <p className="text-[11px] text-[var(--color-charcoal)]/70">
+          Haven&apos;t verified your email yet?{" "}
+          <Link href="/verify-email" className="font-semibold text-[var(--color-forest-green)] underline">
+            Verify or resend link
+          </Link>
+        </p>
+      </div>
 
       {/* Link to Register */}
       <div className="pt-4 border-t border-[var(--color-soft-sage)]/60 text-center">

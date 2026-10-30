@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node scripts/run-milestone-tests.js"
   },
   "dependencies": {
     "argon2": "^0.45.1",
@@ -15,6 +16,7 @@
     "next": "16.4.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "resend": "^6.35.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {

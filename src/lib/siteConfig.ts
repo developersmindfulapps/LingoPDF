@@ -1,3 +1,5 @@
+import { REGIONAL_PRICING } from "./pricing/config";
+
 export interface ProductItem {
   id: string;
   name: string;
@@ -42,6 +44,7 @@ export const siteConfig = {
   tagline: "Your PDFs. Their language. Finally, understood.",
   description:
     "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs, without leaving your document to access translation services.",
+  regionalPricing: REGIONAL_PRICING,
   pricing: {
     german: {
       price: 49,
@@ -96,9 +99,9 @@ export const siteConfig = {
     },
   ] as ProductItem[],
   navLinks: [
-    { label: "Products", href: "#products" },
-    { label: "How It Works", href: "#how-it-works" },
-    { label: "Pricing", href: "#pricing" },
-    { label: "Privacy", href: "#privacy" },
+    { label: "Products", href: "/#products" },
+    { label: "How It Works", href: "/#how-it-works" },
+    { label: "Pricing", href: "/#pricing" },
+    { label: "Privacy", href: "/privacy" },
   ],
 };

@@ -15,6 +15,9 @@ export function Footer() {
             <p className="text-sm text-[var(--color-charcoal)]/80 max-w-sm leading-relaxed font-sans">
               LingoPDF creates focused tools for readers, researchers, and students to read foreign language texts without losing their focus or flow.
             </p>
+            <p className="text-xs text-[var(--color-charcoal)]/60 font-sans">
+              Operating domain: <span className="font-semibold text-[var(--color-forest-green)]">lingopdf.in</span> • Support: <a href="mailto:support@lingopdf.in" className="underline hover:text-[var(--color-forest-green)]">support@lingopdf.in</a>
+            </p>
           </div>
 
           {/* Products Column */}
@@ -29,14 +32,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="#products" className="text-[var(--color-charcoal)]/60 hover:text-[var(--color-forest-green)] transition-colors">
-                  French Reader (Coming)
-                </a>
+                <Link href="/#products" className="text-[var(--color-charcoal)]/60 hover:text-[var(--color-forest-green)] transition-colors">
+                  French Reader (Coming Soon)
+                </Link>
               </li>
               <li>
-                <a href="#products" className="text-[var(--color-charcoal)]/60 hover:text-[var(--color-forest-green)] transition-colors">
-                  Italian Reader (Coming)
-                </a>
+                <Link href="/#products" className="text-[var(--color-charcoal)]/60 hover:text-[var(--color-forest-green)] transition-colors">
+                  Italian Reader (Coming Soon)
+                </Link>
               </li>
             </ul>
           </div>
@@ -48,19 +51,19 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <a href="#pricing" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
-                  Help Center
+                <a href="mailto:support@lingopdf.in" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  Help &amp; Inquiries
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
-                  Contact
+                <a href="mailto:support@lingopdf.in" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  support@lingopdf.in
                 </a>
               </li>
               <li>
-                <a href="#pricing" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
-                  Refund Policy
-                </a>
+                <Link href="/terms#money-back-guarantee" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  Refund Policy (3-Day Guarantee)
+                </Link>
               </li>
             </ul>
           </div>
@@ -88,6 +91,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-charcoal)]/60">
           <p>© 2026 LingoPDF. All rights reserved.</p>
+          <p>Local-First Reading Technology</p>
         </div>
       </div>
     </footer>

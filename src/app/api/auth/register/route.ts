@@ -8,9 +8,12 @@ import {
   createSession,
   sanitizeUser,
   generateOpaqueToken,
+  hashToken,
+  VERIFICATION_EXPIRATION_HOURS,
 } from "@/lib/auth/session";
 import { setSessionCookie } from "@/lib/auth/cookies";
 import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import { sendVerificationEmail } from "@/lib/email/resend";
 
 export async function POST(request: NextRequest) {
   try {
@@ -87,10 +90,13 @@ export async function POST(request: NextRequest) {
     // 5. Hash password using Argon2id
     const passwordHash = await hashPassword(password);
 
-    // 6. Generate unverified account with email verification token
+    // 6. Generate unverified account with hashed single-use verification token
     const now = new Date();
-    const verificationToken = generateOpaqueToken();
-    const verificationExpires = new Date(now.getTime() + 24 * 60 * 60 * 1000); // 24 hours
+    const rawVerificationToken = generateOpaqueToken();
+    const verificationTokenHash = hashToken(rawVerificationToken);
+    const verificationExpires = new Date(
+      now.getTime() + VERIFICATION_EXPIRATION_HOURS * 60 * 60 * 1000
+    );
 
     const newUser = {
       _id: new ObjectId(),
@@ -99,7 +105,7 @@ export async function POST(request: NextRequest) {
       name: name || undefined,
       status: "active" as const,
       isEmailVerified: false,
-      emailVerificationToken: verificationToken,
+      emailVerificationTokenHash: verificationTokenHash,
       emailVerificationExpires: verificationExpires,
       createdAt: now,
       updatedAt: now,
@@ -126,24 +132,58 @@ export async function POST(request: NextRequest) {
       throw insertErr;
     }
 
-    // 7. Create user session upon registration
+    // 7. Send verification email through Resend
+    // Success is reported ONLY when the email provider accepts the send request.
+    const emailResult = await sendVerificationEmail({
+      to: email,
+      name: name || undefined,
+      token: rawVerificationToken,
+    });
+
+    if (!emailResult.success || !emailResult.accepted) {
+      // Rollback user creation to maintain consistency
+      await users.deleteOne({ _id: newUser._id });
+
+      if (emailResult.isDomainUnverified) {
+        return NextResponse.json(
+          {
+            error:
+              "Registration is temporarily paused while sender domain verification is completing. Please try again shortly.",
+            code: "DOMAIN_NOT_VERIFIED",
+          },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error:
+            "Unable to send verification email. Please try again later.",
+          code: "EMAIL_DELIVERY_FAILED",
+        },
+        { status: 502 }
+      );
+    }
+
+    // 8. Create user session upon registration
     const userAgent = request.headers.get("user-agent") || undefined;
     const { token, expiresAt } = await createSession(db, newUser._id, {
       userAgent,
       ipAddress: ip,
     });
 
-    // 8. Prepare safe response
+    // 9. Prepare safe response
     const response = NextResponse.json(
       {
         user: sanitizeUser(newUser),
+        emailAccepted: true,
         message:
-          "Registration successful. Email verification is required before full access.",
+          "Registration successful. A verification link has been sent to your email.",
       },
       { status: 201 }
     );
 
-    // 9. Set secure httpOnly session cookie
+    // 10. Set secure httpOnly session cookie
     setSessionCookie(response, token, expiresAt);
 
     return response;

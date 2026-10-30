@@ -15,6 +15,9 @@ export const metadata: Metadata = {
   title: "LingoPDF PDF Reader — German to English Browser Extension",
   description:
     "Read German PDFs with effortless inline word lookup. Features local dictionary definitions, OCR for scanned documents, and offline capability after activation.",
+  alternates: {
+    canonical: "/products/german-english",
+  },
   openGraph: {
     title: "LingoPDF PDF Reader — German to English",
     description:
@@ -57,7 +60,7 @@ const FAQ_ITEMS = [
   {
     question: "What is the refund policy?",
     answer:
-      "We offer a 7-day money-back guarantee from your date of purchase, subject to our standard published refund terms. If LingoPDF does not meet your reading needs, contact support for a prompt refund.",
+      "We offer a 3-day money-back guarantee from your date of purchase, subject to our standard published refund terms. If LingoPDF does not meet your reading needs, contact support@lingopdf.in for a prompt refund.",
   },
 ];
 
@@ -554,7 +557,11 @@ export default function GermanEnglishProductPage() {
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Seven-day money-back guarantee</span>
+                  <span>Up to 2 active installations per license</span>
+                </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[var(--color-terracotta)] font-bold">✓</span>
+                  <span>Three-day money-back guarantee</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
@@ -565,7 +572,7 @@ export default function GermanEnglishProductPage() {
               <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-4" />
 
               <p className="text-xs text-[var(--color-charcoal)]/60 leading-relaxed font-sans">
-                Full unlimited access requires purchase and activation. 7-day money-back guarantee.
+                Full unlimited access requires purchase and activation. 3-day money-back guarantee.
               </p>
             </div>
           </div>

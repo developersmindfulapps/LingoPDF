@@ -49,6 +49,10 @@ export function RegisterForm() {
           setErrorMessage("Too many registration attempts. Please wait a few minutes before trying again.");
         } else if (data.code === "EMAIL_EXISTS") {
           setErrorMessage("An account with this email address already exists. Please sign in instead.");
+        } else if (data.code === "DOMAIN_NOT_VERIFIED") {
+          setErrorMessage("Registration is temporarily paused while sender domain verification is completing. Please try again shortly.");
+        } else if (data.code === "EMAIL_DELIVERY_FAILED") {
+          setErrorMessage("Unable to send verification email. Please check your email address or try again shortly.");
         } else if (data.code === "DB_UNAVAILABLE") {
           setErrorMessage("Registration service is temporarily unavailable. Please try again shortly.");
         } else {
@@ -81,17 +85,17 @@ export function RegisterForm() {
             Account Created Successfully
           </h2>
           <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-            Welcome to LingoPDF! Your account has been registered.
+            We&apos;ve sent a verification link to <strong className="text-[var(--color-forest-green)]">{email}</strong>.
           </p>
         </div>
 
-        {/* Clear Notice on Email Verification status */}
+        {/* Clear Notice on Email Verification requirements */}
         <div className="rounded-2xl border border-[var(--color-soft-sage)] bg-[var(--color-warm-ivory)]/60 p-4 text-left space-y-2">
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-terracotta)]">
-            <span>Notice: Email Verification</span>
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]">
+            <span>Action Required: Verify Email</span>
           </div>
           <p className="text-xs text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-            Email verification delivery is not yet configured on this system. No verification email was sent. Your account is active for initial exploration and full email verification will be activated in an upcoming update.
+            Please check your inbox and click the verification link within <strong>24 hours</strong> to verify your email address. If you don&apos;t see the email within a few minutes, please check your spam or promotions folder.
           </p>
         </div>
 

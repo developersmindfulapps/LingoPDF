@@ -410,7 +410,7 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Instant download</span>
+                  <span>Up to 2 active devices</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
@@ -418,14 +418,14 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Free daily lookups</span>
+                  <span>5 free lookups / day</span>
                 </div>
               </div>
 
               <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-3" />
 
               <span className="text-xs text-[var(--color-charcoal)]/60 block">
-                7-day money-back guarantee
+                3-day money-back guarantee
               </span>
             </div>
           </div>
