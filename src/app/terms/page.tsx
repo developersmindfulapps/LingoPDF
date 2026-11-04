@@ -5,40 +5,41 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — LingoPDF",
+  title: "Terms of Use — LingoPDF",
   description:
-    "Review the Terms of Service governing your use of the LingoPDF website (https://lingopdf.in) and the LingoPDF PDF Reader browser extension.",
+    "Review the Terms of Use governing your access to https://www.lingopdf.in, your LingoPDF account, and your use of the LingoPDF browser extension.",
   alternates: {
-    canonical: "https://lingopdf.in/terms",
+    canonical: "https://www.lingopdf.in/terms",
   },
   openGraph: {
-    title: "Terms of Service — LingoPDF",
+    title: "Terms of Use — LingoPDF",
     description:
-      "Terms of Service, license terms, usage limits, and refund policies for LingoPDF.",
-    url: "https://lingopdf.in/terms",
+      "Terms of Use, licence terms, regional pricing, referral programme, and refund policies for LingoPDF.",
+    url: "https://www.lingopdf.in/terms",
     type: "website",
   },
 };
 
 const SECTIONS = [
-  { id: "acceptance", title: "1. Acceptance of Terms" },
-  { id: "product-description", title: "2. Product Description and Supported Languages" },
-  { id: "free-tier", title: "3. Free-Tier Usage Limits" },
-  { id: "paid-licenses", title: "4. Paid Licenses, Permitted Use, and Installation Limits" },
-  { id: "purchases-pricing", title: "5. One-Time Purchases and Regional Pricing" },
-  { id: "money-back-guarantee", title: "6. Three-Day Money-Back Guarantee" },
-  { id: "account-responsibilities", title: "7. Account Responsibilities" },
-  { id: "acceptable-use", title: "8. Acceptable Use and Prohibited Abuse" },
-  { id: "intellectual-property", title: "9. Intellectual Property" },
-  { id: "availability-compatibility", title: "10. Product Availability, Updates, and Compatibility" },
-  { id: "disclaimers-liability", title: "11. Warranty Disclaimers and Limitation of Liability" },
-  { id: "suspension-termination", title: "12. Suspension or Termination" },
-  { id: "changes-to-terms", title: "13. Changes to the Terms" },
-  { id: "governing-law", title: "14. Governing Law and Dispute Resolution" },
-  { id: "contact-information", title: "15. Contact Information" },
+  { id: "product-description", title: "1. Product Description" },
+  { id: "current-availability", title: "2. Current Availability and Commercial Features" },
+  { id: "accounts-security", title: "3. Accounts and Security" },
+  { id: "purchases-editions", title: "4. Purchases and Language Editions" },
+  { id: "pricing-regional", title: "5. Pricing and Regional Pricing" },
+  { id: "promotions-referrals", title: "6. Promotional Discounts and Referral Programme" },
+  { id: "money-back-guarantee", title: "7. Three-Day Money-Back Guarantee" },
+  { id: "licence-device-restrictions", title: "8. Licence and Device Restrictions" },
+  { id: "acceptable-use", title: "9. Acceptable Use" },
+  { id: "intellectual-property", title: "10. Intellectual Property and Third-Party Materials" },
+  { id: "updates-compatibility", title: "11. Updates, Availability and Compatibility" },
+  { id: "suspension-termination", title: "12. Suspension and Termination" },
+  { id: "warranty-liability", title: "13. Warranty Disclaimer and Limitation of Liability" },
+  { id: "governing-law", title: "14. Governing Law and Disputes" },
+  { id: "changes-to-terms", title: "15. Changes to These Terms" },
+  { id: "contact-information", title: "16. Contact Information" },
 ];
 
-export default function TermsOfServicePage() {
+export default function TermsOfUsePage() {
   return (
     <div className="min-h-screen flex flex-col bg-[var(--color-warm-ivory)] text-[var(--color-charcoal)] antialiased selection:bg-[var(--color-soft-sage)] selection:text-[var(--color-forest-green)]">
       <Navbar />
@@ -46,16 +47,33 @@ export default function TermsOfServicePage() {
       <main className="flex-1 py-12 sm:py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-12 border-b border-[var(--color-soft-sage)] pb-8">
+          <div id="overview" className="scroll-mt-24 mb-12 border-b border-[var(--color-soft-sage)] pb-8">
             <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[var(--color-terracotta)] mb-3 block">
               Legal Documentation
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--color-forest-green)] mb-4">
-              Terms of Service
+              Terms of Use
             </h1>
-            <p className="text-sm sm:text-base text-[var(--color-charcoal)]/70 font-sans">
-              Last updated: October 2026 • Operational for https://lingopdf.in
+            <p className="text-sm sm:text-base text-[var(--color-charcoal)]/70 font-sans mb-6">
+              Last updated: November 4, 2026 • Operational for https://www.lingopdf.in
             </p>
+            <div className="space-y-4 text-sm sm:text-base text-[var(--color-charcoal)]/90 leading-relaxed font-sans">
+              <p>
+                These Terms of Use govern your access to{" "}
+                <a href="https://www.lingopdf.in" className="text-[var(--color-forest-green)] underline">
+                  https://www.lingopdf.in
+                </a>
+                , your LingoPDF account and your use of the LingoPDF browser extension.
+              </p>
+              <p>
+                By accessing the website, registering an account, downloading or installing the extension, or
+                using LingoPDF services, you agree to these Terms. If you do not agree, do not use the service.
+              </p>
+              <p>
+                These Terms distinguish current functionality from commercial features that are planned but not
+                yet operational.
+              </p>
+            </div>
           </div>
 
           {/* Table of Contents */}
@@ -82,146 +100,222 @@ export default function TermsOfServicePage() {
 
           {/* Terms Content */}
           <div className="space-y-12 text-[var(--color-charcoal)]/90 font-sans leading-relaxed text-sm sm:text-base">
-            {/* 1. Acceptance of terms */}
-            <section id="acceptance" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                1. Acceptance of Terms
-              </h2>
-              <p>
-                By accessing our website (<strong>https://lingopdf.in</strong>), registering an account,
-                or downloading, installing, or using the LingoPDF PDF Reader browser extension, you agree
-                to be bound by these Terms of Service. If you do not agree with any part of these terms,
-                you must not access the website or use the extension software.
-              </p>
-              <p>
-                These terms govern your access to both our public and authenticated web resources and the
-                local client-side software tools we provide.
-              </p>
-            </section>
-
-            {/* 2. Product description and supported languages */}
+            {/* 1. Product Description */}
             <section id="product-description" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                2. Product Description and Supported Languages
+                1. Product Description
               </h2>
               <p>
-                LingoPDF develops browser-based reading software designed to provide contextual
-                vocabulary definitions and grammatical insights for foreign-language documents.
+                LingoPDF provides PDF-reading software designed to help users build vocabulary while reading
+                foreign-language documents.
               </p>
               <p>
-                The primary implemented product is the{" "}
-                <strong>LingoPDF PDF Reader — German → English</strong>, which features native PDF word
-                selection, local dictionary definitions, grammatical inflection parsing, and client-side
-                optical character recognition (OCR) for compatible scanned PDF documents.
+                The currently developed edition is <strong>LingoPDF German → English PDF Reader</strong>.
+              </p>
+              <p>Its functionality includes:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>PDF reading and text selection.</li>
+                <li>German word detection.</li>
+                <li>English dictionary meanings and grammatical information.</li>
+                <li>Local dictionary lookup.</li>
+                <li>Local OCR for supported scanned PDF documents.</li>
+              </ul>
+              <p>
+                LingoPDF is a vocabulary-building reading tool. It is not represented as a complete document
+                translator or a certified translation service.
               </p>
               <p>
-                Additional language editions (including French → English and Italian → English) are
-                currently in development and have not yet been commercially released. Mention of planned
-                language editions represents our forward-looking product roadmap and does not constitute
-                a binding delivery commitment, specific timeline, or immediate product entitlement.
+                Additional language editions may be developed. Mention of future editions does not guarantee a
+                release date or create an entitlement to those editions.
               </p>
             </section>
 
-            {/* 3. Free-tier usage limits */}
-            <section id="free-tier" className="scroll-mt-24 space-y-4">
+            {/* 2. Current Availability and Commercial Features */}
+            <section id="current-availability" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                3. Free-Tier Usage Limits
+                2. Current Availability and Commercial Features
               </h2>
               <p>
-                LingoPDF provides a complimentary free tier that allows prospective users to test the
-                extension with a limit of{" "}
-                <strong>five (5) free word lookups per calendar day</strong>.
+                The current extension build does not yet include the planned commercial payment, licence
+                activation and device-verification systems.
+              </p>
+              <p>Online checkout and paid licence activation are not currently operational.</p>
+              <p>
+                The absence of a payment gate in a development, testing or distribution build does not create a
+                permanent free entitlement, ownership right or commercial licence.
               </p>
               <p>
-                <strong>No Time-Based Free Trial:</strong> We do not offer or impose a time-limited free
-                trial (such as a 3-day or 7-day trial). The five-lookups-per-day allowance is ongoing and
-                renews daily.
+                During the current limited private promotional preview, LingoPDF is shared with a small group of
+                selected testers free of charge. Invited participants are not required to purchase a licence to
+                participate in the promotional preview. This preview is temporary and does not constitute a permanent
+                free tier or guarantee perpetual access.
+              </p>
+              <p>LingoPDF may change access arrangements as commercial features are introduced.</p>
+            </section>
+
+            {/* 3. Accounts and Security */}
+            <section id="accounts-security" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                3. Accounts and Security
+              </h2>
+              <p>
+                You must provide accurate information when creating an account and keep your credentials
+                confidential.
               </p>
               <p>
-                This lookup limit is monitored and stored locally within your browser storage session.
-                Attempting to circumvent, script, reset, or tamper with local storage or browser memory
-                to bypass the daily free quota is strictly prohibited under our acceptable use policy.
+                You are responsible for activity conducted through your account. You must notify{" "}
+                <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
+                  support@lingopdf.in
+                </a>{" "}
+                if you suspect unauthorized access.
+              </p>
+              <p>
+                We may restrict or suspend accounts where reasonably necessary to protect users, the service or its
+                security.
               </p>
             </section>
 
-            {/* 4. Paid licenses, permitted use, and the two-active-installation limit */}
-            <section id="paid-licenses" className="scroll-mt-24 space-y-4">
+            {/* 4. Purchases and Language Editions */}
+            <section id="purchases-editions" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                4. Paid Licenses, Permitted Use, and Installation Limits
+                4. Purchases and Language Editions
               </h2>
+              <p>When commercial checkout becomes available, LingoPDF will operate on a one-time purchase model.</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Each language edition requires a separate purchase.</li>
+                <li>A purchase grants access to the edition identified at checkout.</li>
+                <li>Future updates for that purchased edition are included, subject to these Terms.</li>
+                <li>A purchase does not automatically include other current or future language editions.</li>
+                <li>Purchases are personal and non-transferable unless we expressly authorize otherwise.</li>
+              </ul>
               <p>
-                <em>Please note: Commercial licensing and online checkout are not yet active on this website. Commercial licenses will become available upon the launch of commercial licensing (Phase 7A).</em>
-              </p>
-              <p>
-                When commercially available, purchasing a lifetime license grants you a non-exclusive,
-                non-transferable, revocable personal license to install and execute the extension for
-                personal, academic, or professional reading activities.
-              </p>
-              <p>
-                <strong>Device Installation Limit:</strong> Each individual license permits activation on
-                a maximum of <strong>two (2) active browser installations or personal devices</strong>{" "}
-                concurrently for your own use (for example, a primary desktop workstation and a personal
-                laptop). Sharing license keys, reselling activation codes, or deploying a single license
-                across multi-user environments or shared pools is strictly forbidden.
-              </p>
-              <p>
-                <strong>Offline Functionality:</strong> Following successful one-time license activation,
-                paid functionality is engineered to work completely offline without requiring continuous
-                internet connectivity.
+                There is no recurring subscription or mandatory annual renewal under the approved pricing model.
               </p>
             </section>
 
-            {/* 5. One-time purchases and regional pricing */}
-            <section id="purchases-pricing" className="scroll-mt-24 space-y-4">
+            {/* 5. Pricing and Regional Pricing */}
+            <section id="pricing-regional" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                5. One-Time Purchases and Regional Pricing
+                5. Pricing and Regional Pricing
               </h2>
-              <p>
-                LingoPDF operates on a <strong>one-time payment</strong> model for a lifetime license.
-                We do not charge recurring subscriptions, monthly renewal fees, or mandatory annual dues.
-              </p>
-              <p>
-                <strong>Regional Pricing Model:</strong> We are preparing country-specific regional pricing
-                to ensure fair access across markets:
-              </p>
+              <p>The approved standard prices for the German-to-English edition are:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  <strong>India:</strong> INR pricing, with a proposed price point of ₹899 or ₹999 to be
-                  finalised prior to checkout implementation.
+                  <strong>India:</strong> ₹1,299 INR.
                 </li>
                 <li>
-                  <strong>United States:</strong> USD pricing, initially proposed at $49 (reference $89).
+                  <strong>United States:</strong> $75 USD.
                 </li>
                 <li>
-                  <strong>Europe:</strong> EUR pricing to be configured prior to checkout implementation.
+                  <strong>Eurozone:</strong> €75 EUR.
                 </li>
                 <li>
-                  <strong>Other Countries:</strong> USD fallback or appropriate regional currency where
-                  supported by our future payment infrastructure.
+                  <strong>Standard international pricing:</strong> $75 USD.
+                </li>
+                <li>
+                  <strong>Selected affordability countries:</strong> Admin-configured local-currency prices where
+                  supported, with a configured USD fallback where local-currency checkout is unavailable.
                 </li>
               </ul>
               <p>
-                All prices displayed prior to checkout launch are proposed or tentative and are subject to
-                final approval before commercial orders go live. The displayed currency and actual checkout
-                currency will match. You are responsible for any applicable local sales taxes, VAT, or
-                banking transaction fees imposed by your jurisdiction or financial institution.
+                Regional pricing is determined using the applicable country and pricing rules. INR pricing is
+                reserved for customers detected in India. Customers outside India cannot select INR as their
+                checkout currency.
+              </p>
+              <p>
+                Affordability pricing is available only in selected countries configured by LingoPDF. It is not
+                automatically available in every country.
+              </p>
+              <p>
+                The final price, currency and applicable discount will be shown before a commercial order is placed.
+                The checkout amount and currency will be the authoritative purchase details.
+              </p>
+              <p>
+                Payment processing is not currently active. The prices above describe the approved commercial
+                pricing model and do not indicate that checkout is already available.
               </p>
             </section>
 
-            {/* 6. Three-day money-back guarantee */}
+            {/* 6. Promotional Discounts and Referral Programme */}
+            <section id="promotions-referrals" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                6. Promotional Discounts and Referral Programme
+              </h2>
+              <p>LingoPDF may offer promotional discounts and referral benefits.</p>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Promotional discounts
+                </h3>
+                <p>
+                  Promotional discounts may be offered at 5%, 10%, 15% or 20%, subject to the applicable campaign
+                  terms and availability.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Referral discounts
+                </h3>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li>Eligible referral codes may provide a 10% customer discount.</li>
+                  <li>
+                    A customer may use either an applicable promotional discount or a referral discount on a
+                    purchase. Discounts cannot be combined.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Referral participation
+                </h3>
+                <ul className="list-disc pl-5 space-y-2">
+                  <li>
+                    A referrer may receive a commission equal to 10% of the actual amount collected for an eligible
+                    referred purchase after discounts, subject to the referral programme rules.
+                  </li>
+                  <li>
+                    Referral codes have a lifetime limit of 50 successful paid redemptions. Registrations, abandoned
+                    checkouts and failed or unpaid purchases do not count as successful redemptions. A refund does
+                    not restore a consumed redemption slot.
+                  </li>
+                  <li>
+                    Commission eligibility is subject to a 72-hour hold from the purchase timestamp and any
+                    applicable refund, dispute or fraud restrictions.
+                  </li>
+                  <li>
+                    The minimum payout threshold is five eligible commissions across currencies combined. Payout
+                    batches are processed separately by currency. The first payout is subject to administrative
+                    review and initiation; subsequent payouts may be requested by the referrer.
+                  </li>
+                  <li>
+                    Commissions subject to an open payment dispute may be placed on hold. The final treatment of
+                    those commissions depends on the dispute outcome. Already-paid commissions are not automatically
+                    clawed back.
+                  </li>
+                  <li>
+                    Referral participation is subject to verification, abuse prevention and applicable programme
+                    controls. LingoPDF may suspend referral activity where fraud, manipulation or abuse is reasonably
+                    suspected.
+                  </li>
+                </ul>
+                <p className="text-xs sm:text-sm text-[var(--color-charcoal)]/75">
+                  Referral commission and payout processing will become operational only when the relevant commercial
+                  payment systems are launched.
+                </p>
+              </div>
+            </section>
+
+            {/* 7. Three-Day Money-Back Guarantee */}
             <section id="money-back-guarantee" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                6. Three-Day Money-Back Guarantee
+                7. Three-Day Money-Back Guarantee
               </h2>
+              <p>Each eligible commercial purchase includes a 72-hour money-back guarantee.</p>
+              <p>The 72-hour period begins at the exact timestamp of the successful purchase.</p>
               <p>
-                We provide a contractual{" "}
-                <strong>three (3) calendar day money-back guarantee</strong> calculated from the exact date
-                and time of your original purchase.
-              </p>
-              <p>
-                If the LingoPDF PDF Reader does not meet your personal reading requirements, you may
-                request a full refund within three calendar days of purchase by contacting our support team
-                at:
+                You may request a full refund within that period by contacting:
               </p>
               <p className="font-mono text-sm text-[var(--color-forest-green)]">
                 <a href="mailto:support@lingopdf.in" className="underline">
@@ -229,215 +323,234 @@ export default function TermsOfServicePage() {
                 </a>
               </p>
               <p>
-                Upon issuance of a refund, the associated license key will be deactivated and access to
-                paid features will conclude.
+                The standard guarantee provides a full refund. Partial refunds are not offered as a standard customer
+                option.
               </p>
               <p>
-                <strong>Statutory Rights:</strong> This contractual guarantee operates in addition to, and
-                does not limit, exclude, or waive, any mandatory consumer guarantees or statutory rights
-                that cannot be lawfully excluded under applicable consumer protection legislation in your
-                jurisdiction.
+                Refund requests are subject to review and confirmation. Submitting a request does not itself mean that
+                a refund has been approved or completed.
               </p>
+              <p>Where a full refund is approved and completed, the associated paid entitlement will be revoked.</p>
+              <p>
+                After the 72-hour guarantee period, refunds are not available under the standard guarantee. This does
+                not limit any mandatory statutory consumer rights that apply to you.
+              </p>
+              <p>
+                Where a payment dispute or chargeback is opened, access and unpaid referral commissions may be
+                restricted while the dispute is reviewed. The consequences will depend on the outcome and any other
+                applicable restrictions.
+              </p>
+              <p>This refund process will apply when commercial payment processing is operational.</p>
             </section>
 
-            {/* 7. Account responsibilities */}
-            <section id="account-responsibilities" className="scroll-mt-24 space-y-4">
+            {/* 8. Licence and Device Restrictions */}
+            <section id="licence-device-restrictions" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                7. Account Responsibilities
+                8. Licence and Device Restrictions
               </h2>
-              <p>
-                User accounts are implemented on https://lingopdf.in. When creating an account, you agree
-                to provide accurate registration information and to maintain the confidentiality of your
-                account password and security credentials.
-              </p>
-              <p>
-                You are responsible for all activities conducted through your account credentials. You
-                agree to notify us immediately at{" "}
-                <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
-                  support@lingopdf.in
-                </a>{" "}
-                if you suspect unauthorized access to or compromise of your account.
-              </p>
-              <p>
-                LingoPDF is not liable for losses caused by compromised passwords or voluntary credential
-                sharing by the account holder.
-              </p>
-            </section>
-
-            {/* 8. Acceptable use and prohibited abuse */}
-            <section id="acceptable-use" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                8. Acceptable Use and Prohibited Abuse
-              </h2>
-              <p>You agree not to engage in any of the following prohibited behaviors:</p>
+              <p>Each commercial purchase is intended to permit use on one active device.</p>
+              <p>Commercial activation and device-management controls are planned and are not yet operational.</p>
+              <p>When implemented:</p>
               <ul className="list-disc pl-5 space-y-2">
+                <li>A licence will be associated with the relevant account and purchase.</li>
+                <li>One active device will be permitted per purchase.</li>
+                <li>Device replacement will require a support request and verification.</li>
+                <li>The existing device binding may be revoked before a replacement device is activated.</li>
+                <li>Sharing, reselling or distributing activation credentials is prohibited.</li>
                 <li>
-                  Decompiling, disassembling, reverse engineering, or attempting to derive the source
-                  code of the extension, except where expressly permitted by applicable mandatory law.
-                </li>
-                <li>
-                  Extracting, scraping, bulk-exporting, or redistributing the underlying lexical datasets,
-                  dictionary entries, or grammatical inflection tables bundled with the software.
-                </li>
-                <li>
-                  Circumventing licensing controls, tampering with activation mechanisms, spoofing client-side
-                  parameters, or distributing unauthorized key generation utilities.
-                </li>
-                <li>
-                  Interfering with the operation, security, or network availability of the website, API
-                  endpoints, or associated database infrastructure.
-                </li>
-                <li>
-                  Attempting to bypass or tamper with the five-word daily free tier limit.
+                  Following successful activation, the product is intended to support offline use, subject to the
+                  planned offline-verification and grace-period rules.
                 </li>
               </ul>
+              <p>
+                The technical enforcement of these restrictions will apply once the licensing system is launched.
+              </p>
             </section>
 
-            {/* 9. Intellectual property */}
+            {/* 9. Acceptable Use */}
+            <section id="acceptable-use" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                9. Acceptable Use
+              </h2>
+              <p>You agree not to:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Use LingoPDF for unlawful activities.</li>
+                <li>Interfere with the security, availability or operation of the website or extension.</li>
+                <li>Attempt unauthorized access to accounts, APIs, databases or administrative functions.</li>
+                <li>Distribute malware or use the service to compromise another person&apos;s device or data.</li>
+                <li>
+                  Redistribute the extension, proprietary dictionary compilations or other protected materials without
+                  authorization.
+                </li>
+                <li>
+                  Scrape, bulk-extract or commercially redistribute bundled dictionary datasets except where permitted
+                  by applicable law or the relevant dataset licence.
+                </li>
+                <li>Circumvent commercial licensing, activation or access controls once implemented.</li>
+                <li>
+                  Abuse referral codes, manipulate referral attribution or create fraudulent transactions or
+                  commission claims.
+                </li>
+              </ul>
+              <p>
+                Nothing in these Terms prohibits activities that cannot lawfully be restricted under applicable
+                mandatory law.
+              </p>
+            </section>
+
+            {/* 10. Intellectual Property and Third-Party Materials */}
             <section id="intellectual-property" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                9. Intellectual Property
+                10. Intellectual Property and Third-Party Materials
               </h2>
               <p>
-                All software, user interfaces, branding, visual identity, logos, domain names, and
-                proprietary dictionary compilations provided by LingoPDF are the intellectual property
-                of the creator and operator of LingoPDF (&ldquo;LingoPDF&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;)
-                and its licensors.
+                LingoPDF&apos;s software, website design, branding, logos and original product materials are
+                protected by applicable intellectual-property laws.
               </p>
               <p>
-                Your purchase grants you an installation license as specified in Section 4; it does not
-                convey ownership of the software, trademarks, or lexical databases. All rights not
-                expressly granted are reserved.
+                Unless otherwise stated, these materials belong to the creator and operator of LingoPDF or the
+                relevant licensors.
+              </p>
+              <p>
+                The extension may include third-party software, dictionary datasets, OCR resources and other
+                components subject to their own licences and notices.
+              </p>
+              <p>
+                Nothing in these Terms transfers ownership of LingoPDF&apos;s intellectual property to you. Your
+                right to use the product is limited to the access or licence expressly granted to you.
               </p>
             </section>
 
-            {/* 10. Product availability, updates, and compatibility */}
-            <section id="availability-compatibility" className="scroll-mt-24 space-y-4">
+            {/* 11. Updates, Availability and Compatibility */}
+            <section id="updates-compatibility" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                10. Product Availability, Updates, and Compatibility
+                11. Updates, Availability and Compatibility
               </h2>
+              <p>We may release updates, bug fixes, compatibility changes and dictionary improvements.</p>
               <p>
-                We strive to keep the LingoPDF extension compatible with modern versions of Chromium-based
-                browsers (such as Google Chrome and Microsoft Edge). However, we cannot guarantee
-                continuous, uninterrupted compatibility with obsolete operating systems, unsupported
-                third-party browser forks, or malformed, password-protected, or non-standard PDF formats.
+                We aim to support compatible versions of modern Chromium-based browsers. However, we do not
+                guarantee uninterrupted availability or compatibility with every browser, operating system, PDF file
+                or third-party environment.
               </p>
               <p>
-                We may release software updates, bug patches, and dictionary revisions from time to time.
-                Certain updates may be necessary to maintain compatibility with updated browser APIs or
-                security standards.
+                Some PDFs may be malformed, password-protected, image-only or otherwise incompatible with particular
+                features.
+              </p>
+              <p>
+                We may modify, improve, suspend or discontinue features where reasonably necessary for maintenance,
+                security, legal compliance or product development.
               </p>
             </section>
 
-            {/* 11. Warranty disclaimers and limitation of liability */}
-            <section id="disclaimers-liability" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                11. Warranty Disclaimers and Limitation of Liability
-              </h2>
-              <p>
-                The software and website are provided on an <strong>&ldquo;as is&rdquo;</strong> and{" "}
-                <strong>&ldquo;as available&rdquo;</strong> basis without warranties of any kind, either
-                express or implied, including but not limited to implied warranties of merchantability,
-                fitness for a particular purpose, or non-infringement.
-              </p>
-              <p>
-                While our dictionary and local OCR engines are curated with care, we do not warrant that
-                translation results or OCR transcriptions will be completely error-free, exhaustive, or
-                sufficient for specialized legal, medical, sworn, or official regulatory translations.
-              </p>
-              <p>
-                To the maximum extent permitted by applicable law, in no event shall LingoPDF be liable
-                for indirect, incidental, special, consequential, or punitive damages arising out of your
-                use of or inability to use the product. Our aggregate liability for any claims arising
-                under these terms shall not exceed the amount actually paid by you for the product.
-                Nothing in these terms limits or excludes liability that cannot be lawfully limited under
-                applicable mandatory consumer protection statutes.
-              </p>
-            </section>
-
-            {/* 12. Suspension or termination */}
+            {/* 12. Suspension and Termination */}
             <section id="suspension-termination" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                12. Suspension or Termination
+                12. Suspension and Termination
               </h2>
+              <p>We may suspend or terminate access where reasonably necessary in response to:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Serious violations of these Terms.</li>
+                <li>Fraudulent activity or payment abuse.</li>
+                <li>Unauthorized redistribution or resale.</li>
+                <li>Security threats or attempts to compromise the service.</li>
+                <li>Referral manipulation or commission abuse.</li>
+                <li>Legal or regulatory requirements.</li>
+              </ul>
               <p>
-                We reserve the right to suspend or terminate website account access if we detect evidence
-                of account credential stuffing, brute-force attacks, security abuse, or severe violations
-                of our acceptable use policy.
+                Where commercial licensing is operational, restrictions may also affect the associated licence and
+                entitlement, subject to applicable law and the relevant purchase and refund conditions.
               </p>
-              <p>
-                When commercial licensing is deployed in Phase 7A, we will similarly maintain the right
-                to revoke a license key and restrict access to future updates if license fraud, unauthorized
-                reselling, or concurrent activation beyond the permitted two-device seat limit is identified.
-              </p>
+              <p>We will not treat a mere technical error or an unverified allegation as proof of misconduct.</p>
             </section>
 
-            {/* 13. Changes to the terms */}
-            <section id="changes-to-terms" className="scroll-mt-24 space-y-4">
+            {/* 13. Warranty Disclaimer and Limitation of Liability */}
+            <section id="warranty-liability" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                13. Changes to the Terms
+                13. Warranty Disclaimer and Limitation of Liability
               </h2>
               <p>
-                We may revise these Terms of Service periodically to reflect product updates, regulatory
-                developments, or shifts in our business operations. When amendments occur, we will post
-                the updated version here and revise the &ldquo;Last updated&rdquo; timestamp at the top
-                of this page.
+                To the maximum extent permitted by applicable law, the website and software are provided on an
+                &ldquo;as is&rdquo; and &ldquo;as available&rdquo; basis.
+              </p>
+              <p>We do not warrant that:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Dictionary definitions will always be complete or suitable for every context.</li>
+                <li>OCR output will be entirely accurate.</li>
+                <li>The product will support every PDF or browser environment.</li>
+                <li>The website or extension will be continuously available without interruption.</li>
+              </ul>
+              <p>
+                LingoPDF is a vocabulary-learning and reading aid. It is not a substitute for certified, legal,
+                medical, sworn or official translation services.
               </p>
               <p>
-                Continued use of the website or extension following notice of changes constitutes
-                acceptance of the revised terms.
+                To the maximum extent permitted by law, LingoPDF will not be liable for indirect, incidental,
+                special or consequential losses arising from use of the service.
+              </p>
+              <p>
+                Nothing in these Terms excludes or limits liability that cannot lawfully be excluded or limited under
+                applicable law, including mandatory consumer rights.
               </p>
             </section>
 
-            {/* 14. Governing law and dispute resolution */}
+            {/* 14. Governing Law and Disputes */}
             <section id="governing-law" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                14. Governing Law and Dispute Resolution
+                14. Governing Law and Disputes
               </h2>
               <p>
-                These terms shall be governed by and construed in accordance with applicable law. The
-                definitive legal jurisdiction, designated dispute resolution venue, and registered business
-                entity details will be formally published alongside official company registration records
-                prior to the launch of commercial transactions.
+                The applicable governing law, jurisdiction and formal dispute-resolution arrangements must be
+                confirmed and published with the relevant business registration details before commercial
+                transactions begin.
               </p>
               <p>
-                In the event of any disagreement or dispute, we strongly encourage contacting us first
-                at{" "}
+                If you have a concern or dispute, please contact{" "}
                 <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
                   support@lingopdf.in
                 </a>{" "}
-                to reach an amicable, informal resolution.
+                first so that we can attempt to resolve it informally.
+              </p>
+              <p>Nothing in this section removes any mandatory rights or remedies available under applicable law.</p>
+            </section>
+
+            {/* 15. Changes to These Terms */}
+            <section id="changes-to-terms" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                15. Changes to These Terms
+              </h2>
+              <p>
+                We may update these Terms to reflect product changes, new commercial features, legal requirements or
+                operational developments.
+              </p>
+              <p>
+                The latest revision date will be displayed at the top of this page. Material changes will be
+                communicated through an appropriate website notice or other suitable channel.
               </p>
             </section>
 
-            {/* 15. Contact information */}
+            {/* 16. Contact Information */}
             <section id="contact-information" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                15. Contact Information
+                16. Contact Information
               </h2>
-              <p>
-                If you have questions regarding these Terms of Service, license terms, or refund
-                requests, please contact:
-              </p>
+              <p>For questions about these Terms, accounts, purchases, referrals or refunds:</p>
               <div className="rounded-2xl border border-[var(--color-soft-sage)] bg-white p-5 sm:p-6 shadow-2xs max-w-md">
-                <p className="font-semibold text-[var(--color-forest-green)] mb-1">
-                  LingoPDF Legal &amp; Customer Support
-                </p>
-                <p className="text-sm text-[var(--color-charcoal)]/80 mb-2">
-                  Customer Inquiries &amp; Refund Assistance:
-                </p>
+                <p className="font-semibold text-[var(--color-forest-green)] mb-1">LingoPDF Support</p>
+                <p className="text-sm text-[var(--color-charcoal)]/80 mb-2">Customer &amp; Account Assistance:</p>
                 <p className="text-sm font-mono text-[var(--color-forest-green)]">
                   <a href="mailto:support@lingopdf.in" className="underline">
                     support@lingopdf.in
                   </a>
                 </p>
                 <p className="text-xs text-[var(--color-charcoal)]/60 mt-3">
-                  Website: <a href="https://lingopdf.in" className="underline">https://lingopdf.in</a>
+                  Website:{" "}
+                  <a href="https://www.lingopdf.in" className="underline">
+                    https://www.lingopdf.in
+                  </a>
                 </p>
                 <p className="text-xs text-[var(--color-charcoal)]/60 mt-1">
-                  Formal registered corporate entity details, statutory registration numbers, and
-                  official service-of-process addresses will be formally published upon commercial business
-                  registration.
+                  Business registration details and the applicable formal service address will be added when the
+                  relevant business registration is completed.
                 </p>
               </div>
             </section>
@@ -452,7 +565,7 @@ export default function TermsOfServicePage() {
               <span>← Return to Home</span>
             </Link>
             <a
-              href="#acceptance"
+              href="#overview"
               className="text-xs sm:text-sm font-medium text-[var(--color-charcoal)]/70 hover:text-[var(--color-forest-green)]"
             >
               Back to top ↑

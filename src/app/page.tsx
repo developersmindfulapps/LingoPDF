@@ -26,25 +26,29 @@ export default function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
               {/* Left Column: Headline, Copy & CTAs */}
               <div className="lg:col-span-7 flex flex-col items-start text-left z-10">
-                {/* Eyebrow */}
-                <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[var(--color-terracotta)] mb-4 inline-block">
-                  Read without losing your flow
-                </span>
+                {/* Promotional Preview Badge */}
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[var(--color-soft-sage)] text-xs font-semibold text-[var(--color-forest-green)] mb-6 shadow-2xs">
+                  <span className="h-2 w-2 rounded-full bg-[var(--color-terracotta)] animate-pulse" />
+                  <span className="font-bold uppercase tracking-wider text-[var(--color-terracotta)]">Private Promotional Preview</span>
+                  <span className="text-[var(--color-charcoal)]/40">•</span>
+                  <span>Free for invited testers</span>
+                </div>
 
-                {/* Main Heading */}
+                {/* Main Heading & Approved Tagline */}
                 <h1 className="font-heading text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--color-forest-green)] leading-[1.08] mb-6">
-                  Your PDFs. Their
+                  Read German.
                   <br />
-                  language.
-                  <br />
-                  Finally,{" "}
                   <span className="italic font-serif text-[var(--color-terracotta)] font-normal">
-                    understood.
+                    Learn Every Word.
                   </span>
                 </h1>
 
-                {/* Description */}
-                <p className="font-sans text-base sm:text-lg lg:text-xl text-[var(--color-charcoal)]/80 max-w-xl leading-relaxed mb-8">
+                {/* Promotional Preview Description */}
+                <p className="font-sans text-base sm:text-lg lg:text-xl text-[var(--color-forest-green)] font-semibold max-w-xl leading-relaxed mb-3">
+                  LingoPDF is currently being shared with a small group of selected testers. During this preview, invited participants can use the German vocabulary-building PDF reader free of charge.
+                </p>
+
+                <p className="font-sans text-sm sm:text-base text-[var(--color-charcoal)]/80 max-w-xl leading-relaxed mb-8">
                   A German-to-English vocabulary-building PDF reader with effortless inline word lookup. Built for native Chrome and web PDFs so you can inspect unfamiliar words in context without leaving your document.
                 </p>
 
@@ -221,7 +225,7 @@ export default function Home() {
                   </p>
 
                   {/* Feature Tags */}
-                  <div className="flex flex-wrap gap-2.5 mb-8">
+                  <div className="flex flex-wrap gap-2.5 mb-6">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-warm-ivory)] border border-[var(--color-soft-sage)] text-xs font-medium text-[var(--color-forest-green)]">
                       ✓ Native Chrome &amp; Web PDFs
                     </span>
@@ -233,8 +237,17 @@ export default function Home() {
                     </span>
                   </div>
 
-                  {/* Configurable Pricing Presentation */}
-                  <div className="mb-6">
+                  {/* Promotional Notice & Planned Commercial Pricing */}
+                  <div className="w-full mb-6 p-4 rounded-2xl bg-[var(--color-warm-ivory)]/50 border border-[var(--color-soft-sage)]">
+                    <div className="text-xs font-bold text-[var(--color-terracotta)] uppercase tracking-wider mb-1">
+                      Private Promotional Preview
+                    </div>
+                    <p className="text-xs text-[var(--color-charcoal)]/80 mb-3">
+                      LingoPDF is currently shared free of charge with selected invited testers. No purchase is required to participate in the preview.
+                    </p>
+                    <span className="text-[11px] font-semibold text-[var(--color-charcoal)]/60 uppercase tracking-wider block mb-1">
+                      Planned Commercial Launch Pricing:
+                    </span>
                     <PricingDisplay
                       price={germanPricing.price}
                       originalPrice={germanPricing.originalPrice}
@@ -383,13 +396,26 @@ export default function Home() {
         {/* 8. Final Pricing CTA */}
         <section id="pricing" className="py-20 sm:py-28 bg-[var(--color-warm-ivory)]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-forest-green)] mb-12">
-              Start reading with confidence.
+            {/* Promotional Preview Notice */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-[var(--color-soft-sage)] text-xs font-semibold text-[var(--color-forest-green)] mb-4">
+              <span className="font-bold uppercase tracking-wider text-[var(--color-terracotta)]">Private Promotional Preview</span>
+              <span className="text-[var(--color-charcoal)]/40">•</span>
+              <span>Free for Invited Testers</span>
+            </div>
+
+            <h2 className="font-heading text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-forest-green)] mb-3">
+              Planned Commercial Launch &amp; Preview
             </h2>
+            <p className="max-w-2xl mx-auto text-sm sm:text-base text-[var(--color-charcoal)]/80 mb-10 leading-relaxed font-sans">
+              LingoPDF is currently being shared with a small group of selected testers. During this preview, invited participants can use the German vocabulary-building PDF reader free of charge. Following the preview, LingoPDF will launch under our standard one-time edition commercial model.
+            </p>
 
             <div className="max-w-md mx-auto rounded-3xl border border-[var(--color-soft-sage)] bg-white p-8 sm:p-10 shadow-lg text-center">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]/80 mb-3 block">
+              <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]/80 mb-1 block">
                 German–English Edition
+              </span>
+              <span className="text-xs font-medium text-[var(--color-terracotta)] mb-4 block">
+                Planned Commercial Pricing (Free for Invited Testers During Preview)
               </span>
 
               <div className="my-6">
@@ -424,8 +450,8 @@ export default function Home() {
 
               <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-3" />
 
-              <span className="text-xs text-[var(--color-charcoal)]/60 block">
-                Paid-only product • No free tier or free trial • 3-day money-back guarantee
+              <span className="text-xs text-[var(--color-charcoal)]/60 block leading-relaxed">
+                Limited private promotional preview for invited testers • Future commercial model: 1 device per purchase • No free tier or free trial upon commercial launch
               </span>
             </div>
           </div>

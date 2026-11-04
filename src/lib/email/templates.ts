@@ -209,3 +209,112 @@ support@lingopdf.in
 
   return { subject, html, text };
 }
+
+
+export function renderReferralQuotaReachedEmail(params: {
+  name?: string;
+  referralCode: string;
+  dashboardUrl: string;
+}): EmailTemplateResult {
+  const { name, referralCode, dashboardUrl } = params;
+  const greeting = name ? `Hello ${name},` : "Hello,";
+  const subject = "Your LingoPDF referral code has reached its limit";
+
+  const text = `${greeting}
+
+Congratulations! Your LingoPDF referral code (${referralCode}) has reached its limit of 50 successful redemptions.
+
+Because this code has reached its capacity, it can no longer be used for new discounts or purchases. All of your existing commissions and earned payouts remain completely secure and intact.
+
+You are now eligible to generate a brand new referral code with a fresh 50-redemption allowance.
+
+Visit your referral dashboard to generate your new referral code:
+${dashboardUrl}
+
+Thank you for being a valued part of the LingoPDF community!
+
+Best regards,
+The LingoPDF Team
+support@lingopdf.in
+`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${subject}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F8F5EE; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #242923; line-height: 1.6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F5EE; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; background-color: #FFFFFF; border: 1px solid #E8E4D9; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(25, 60, 50, 0.04);">
+          <!-- Brand Header -->
+          <tr>
+            <td style="background-color: #193C32; padding: 28px 36px; text-align: left;">
+              <span style="font-size: 22px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px;">Lingo<span style="color: #D87854;">PDF</span></span>
+            </td>
+          </tr>
+
+          <!-- Main Content -->
+          <tr>
+            <td style="padding: 36px 36px 24px 36px;">
+              <h1 style="font-size: 20px; font-weight: 700; color: #193C32; margin: 0 0 16px 0; line-height: 1.3;">Referral code limit reached</h1>
+              <p style="font-size: 15px; color: #242923; margin: 0 0 20px 0;">${greeting}</p>
+              <p style="font-size: 15px; color: #242923; margin: 0 0 20px 0;">
+                Congratulations! Your LingoPDF referral code <strong style="color: #193C32; font-family: monospace; font-size: 16px;">${referralCode}</strong> has reached its maximum limit of <strong>50 successful paid redemptions</strong>.
+              </p>
+              <p style="font-size: 14px; color: #555555; margin: 0 0 24px 0;">
+                Because this code has reached its capacity, it is now exhausted and cannot be used for additional redemptions. All your previously earned commissions, attribution history, and pending payouts remain fully preserved and unchanged.
+              </p>
+
+              <!-- Notice Box -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F5EE; border-left: 3px solid #D87854; border-radius: 0 8px 8px 0; padding: 14px 16px; margin: 20px 0;">
+                <tr>
+                  <td>
+                    <p style="margin: 0; font-size: 13px; color: #242923; line-height: 1.5;">
+                      <strong>Ready for your next code?</strong> You are now eligible to create a new referral code on your dashboard. Each newly generated code receives its own 50-redemption allowance!
+                    </p>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Action Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 28px 0;">
+                <tr>
+                  <td align="center" style="border-radius: 10px; background-color: #193C32;">
+                    <a href="${dashboardUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; padding: 14px 28px; font-size: 15px; font-weight: 600; color: #FFFFFF; text-decoration: none; border-radius: 10px;">
+                      Create New Referral Code
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 13px; color: #666666; margin: 24px 0 0 0; word-break: break-all;">
+                If the button above does not work, visit your referral dashboard directly:<br>
+                <a href="${dashboardUrl}" style="color: #193C32; text-decoration: underline;">${dashboardUrl}</a>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F8F5EE; padding: 20px 36px; border-top: 1px solid #E8E4D9; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 12px; color: #777777;">
+                LingoPDF • German-to-English Vocabulary Reader
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #777777;">
+                Questions? Contact us at <a href="mailto:support@lingopdf.in" style="color: #193C32; text-decoration: underline;">support@lingopdf.in</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html, text };
+}

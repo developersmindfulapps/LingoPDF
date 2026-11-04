@@ -1,5 +1,9 @@
 import { Resend } from "resend";
-import { renderVerificationEmail, renderPasswordResetEmail } from "./templates";
+import {
+  renderVerificationEmail,
+  renderPasswordResetEmail,
+  renderReferralQuotaReachedEmail,
+} from "./templates";
 
 export interface SendEmailResult {
   success: boolean;
@@ -19,7 +23,7 @@ export function getTrustedAppUrl(): string {
   const envUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
     (process.env.NODE_ENV === "production"
-      ? "https://lingopdf.in"
+      ? "https://www.lingopdf.in"
       : "http://localhost:3000");
   return envUrl.replace(/\/+$/, "");
 }
@@ -222,6 +226,85 @@ export async function sendPasswordResetEmail(params: {
       error: errMsg,
       code: isUnverified ? "DOMAIN_NOT_VERIFIED" : "NETWORK_ERROR",
       isDomainUnverified: isUnverified,
+    };
+  }
+}
+
+
+/**
+ * Sends an email notification when a referral code reaches its 50th successful paid redemption.
+ */
+export async function sendReferralQuotaReachedEmail(params: {
+  to: string;
+  name?: string;
+  referralCode: string;
+}): Promise<SendEmailResult> {
+  const { to, name, referralCode } = params;
+  const baseUrl = getTrustedAppUrl();
+  const dashboardUrl = `${baseUrl}/account/referrals`;
+  const template = renderReferralQuotaReachedEmail({ name, referralCode, dashboardUrl });
+  const { from, replyTo } = getEmailConfig();
+
+  if (isMockEmailActive()) {
+    return {
+      success: true,
+      accepted: true,
+      messageId: `mock-quota-${Date.now()}`,
+      isMocked: true,
+    };
+  }
+
+  const { resend, error: clientError } = getResendClient();
+  if (!resend) {
+    return {
+      success: false,
+      accepted: false,
+      error: clientError || "Email client unavailable",
+      code: "EMAIL_NOT_CONFIGURED",
+    };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      replyTo,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      const errMsg = error.message || "Failed to send referral quota notification";
+      return {
+        success: false,
+        accepted: false,
+        error: errMsg,
+        code: "RESEND_ERROR",
+      };
+    }
+
+    if (!data?.id) {
+      return {
+        success: false,
+        accepted: false,
+        error: "Resend did not return a message identifier",
+        code: "NO_MESSAGE_ID",
+      };
+    }
+
+    return {
+      success: true,
+      accepted: true,
+      messageId: data.id,
+    };
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : "Unknown email error";
+    return {
+      success: false,
+      accepted: false,
+      error: errMsg,
+      code: "NETWORK_ERROR",
     };
   }
 }

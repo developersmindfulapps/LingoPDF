@@ -1675,6 +1675,14 @@ export async function finalizeCapturedReferralRedemption(
       "Unable to finalize referral conversion: no pending reservation or 50-redemption cap reached."
     );
   }
+
+  if (updated.successfulConversionsCount >= MAX_SUCCESSFUL_REFERRALS_PER_USER) {
+    await referralProfilesCol.updateOne(
+      { _id: updated._id, status: { $ne: "exhausted" } },
+      { $set: { status: "exhausted", exhaustedAt: now, updatedAt: now } }
+    );
+  }
+
   return updated;
 }
 

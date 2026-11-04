@@ -16,7 +16,7 @@ export function Footer() {
               LingoPDF creates focused tools for readers, researchers, and students to read foreign language texts without losing their focus or flow.
             </p>
             <p className="text-xs text-[var(--color-charcoal)]/60 font-sans">
-              Operating domain: <span className="font-semibold text-[var(--color-forest-green)]">lingopdf.in</span> • Support: <a href="mailto:support@lingopdf.in" className="underline hover:text-[var(--color-forest-green)]">support@lingopdf.in</a>
+              Operating domain: <span className="font-semibold text-[var(--color-forest-green)]">www.lingopdf.in</span> • Support: <a href="mailto:support@lingopdf.in" className="underline hover:text-[var(--color-forest-green)]">support@lingopdf.in</a>
             </p>
           </div>
 

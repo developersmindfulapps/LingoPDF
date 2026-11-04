@@ -12,8 +12,30 @@ import {
   enforceIpRateLimit,
   enforceEmailRateLimit,
 } from "@/lib/auth/rateLimit";
-import { enforceCsrfProtection } from "@/lib/security/csrf";
+import {
+  enforceCsrfProtection,
+  handleCorsPreflight,
+  getCorsHeaders,
+} from "@/lib/security/csrf";
 import { logger } from "@/lib/observability/logger";
+
+function withCors(response: NextResponse, request: NextRequest): NextResponse {
+  const corsHeaders = getCorsHeaders(request);
+  if (corsHeaders) {
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      response.headers.set(key, value);
+    }
+  }
+  return response;
+}
+
+/**
+ * Handles CORS preflight OPTIONS requests for /api/auth/login.
+ * Validates origin against explicit production allowlist.
+ */
+export async function OPTIONS(request: NextRequest) {
+  return handleCorsPreflight(request);
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,7 +53,7 @@ export async function POST(request: NextRequest) {
         "Too many login attempts. Please try again later.",
     });
     if (ipBlocked) {
-      return ipBlocked;
+      return withCors(ipBlocked, request);
     }
 
     // 3. Body parsing and validation
@@ -39,20 +61,26 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON payload", code: "INVALID_JSON" },
-        { status: 400 }
+      return withCors(
+        NextResponse.json(
+          { error: "Invalid JSON payload", code: "INVALID_JSON" },
+          { status: 400 }
+        ),
+        request
       );
     }
 
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid email or password format",
-          code: "VALIDATION_ERROR",
-        },
-        { status: 400 }
+      return withCors(
+        NextResponse.json(
+          {
+            error: "Invalid email or password format",
+            code: "VALIDATION_ERROR",
+          },
+          { status: 400 }
+        ),
+        request
       );
     }
 
@@ -66,7 +94,7 @@ export async function POST(request: NextRequest) {
         "Too many login attempts. Please try again later.",
     });
     if (emailBlocked) {
-      return emailBlocked;
+      return withCors(emailBlocked, request);
     }
 
     // 5. Connect to MongoDB
@@ -75,12 +103,15 @@ export async function POST(request: NextRequest) {
       db = await getDb();
     } catch (dbErr) {
       logger.error("auth_login_db_unavailable", { error: dbErr });
-      return NextResponse.json(
-        {
-          error: "Database service unavailable. Please check system configuration.",
-          code: "DB_UNAVAILABLE",
-        },
-        { status: 503 }
+      return withCors(
+        NextResponse.json(
+          {
+            error: "Database service unavailable. Please check system configuration.",
+            code: "DB_UNAVAILABLE",
+          },
+          { status: 503 }
+        ),
+        request
       );
     }
 
@@ -90,29 +121,38 @@ export async function POST(request: NextRequest) {
     const user = await users.findOne({ email });
     if (!user) {
       // Timing-safe response: generic invalid credentials message
-      return NextResponse.json(
-        { error: "Invalid email or password", code: "INVALID_CREDENTIALS" },
-        { status: 401 }
+      return withCors(
+        NextResponse.json(
+          { error: "Invalid email or password", code: "INVALID_CREDENTIALS" },
+          { status: 401 }
+        ),
+        request
       );
     }
 
     // 7. Account status check
     if (user.status === "suspended") {
-      return NextResponse.json(
-        {
-          error: "Your account has been suspended. Please contact support.",
-          code: "ACCOUNT_SUSPENDED",
-        },
-        { status: 403 }
+      return withCors(
+        NextResponse.json(
+          {
+            error: "Your account has been suspended. Please contact support.",
+            code: "ACCOUNT_SUSPENDED",
+          },
+          { status: 403 }
+        ),
+        request
       );
     }
 
     // 8. Verify password with Argon2id
     const passwordMatch = await verifyPassword(user.passwordHash, password);
     if (!passwordMatch) {
-      return NextResponse.json(
-        { error: "Invalid email or password", code: "INVALID_CREDENTIALS" },
-        { status: 401 }
+      return withCors(
+        NextResponse.json(
+          { error: "Invalid email or password", code: "INVALID_CREDENTIALS" },
+          { status: 401 }
+        ),
+        request
       );
     }
 
@@ -135,12 +175,16 @@ export async function POST(request: NextRequest) {
     // 11. Set secure httpOnly session cookie
     setSessionCookie(response, token, expiresAt);
 
-    return response;
+    // 12. Attach CORS headers for authorized origin
+    return withCors(response, request);
   } catch (error) {
     logger.error("auth_login_unexpected_error", { error });
-    return NextResponse.json(
-      { error: "Internal server error", code: "INTERNAL_ERROR" },
-      { status: 500 }
+    return withCors(
+      NextResponse.json(
+        { error: "Internal server error", code: "INTERNAL_ERROR" },
+        { status: 500 }
+      ),
+      request
     );
   }
 }

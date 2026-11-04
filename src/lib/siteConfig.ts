@@ -41,7 +41,7 @@ export const extensionStoreConfig = {
 
 export const siteConfig = {
   name: "LingoPDF",
-  tagline: "Your PDFs. Their language. Finally, understood.",
+  tagline: "Read German. Learn Every Word.",
   description:
     "Read German PDFs and build vocabulary in context with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs.",
   regionalPricing: REGIONAL_PRICING,

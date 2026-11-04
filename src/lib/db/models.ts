@@ -82,7 +82,7 @@ export type EntitlementRevocationReason =
 export type PromotionMode = "promo" | "normal";
 export type PromotionSettingsId = "global_referral_promo";
 
-export type ReferralProfileStatus = "active" | "suspended" | "revoked";
+export type ReferralProfileStatus = "active" | "exhausted" | "suspended" | "revoked";
 export type ReferralPayoutMethod =
   | "upi"
   | "bank_transfer"
@@ -428,6 +428,11 @@ export interface ReferralProfileDocument {
   riskHoldReason?: string | null;
   adminOverrideReason?: string | null;
   suspensionHistory?: ReferralSuspensionHistoryEntry[];
+  exhaustedAt?: Date | null;
+  quotaNotificationStatus?: "pending" | "sent" | "failed" | null;
+  quotaNotificationSentAt?: Date | null;
+  quotaNotificationMessageId?: string | null;
+  quotaNotificationError?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -879,7 +884,10 @@ export async function ensureIndexes(db: Db): Promise<ProvisionedIndexSummary[]> 
         createOrReconcileIndex(
           referralProfilesCollection,
           { userId: 1 },
-          { unique: true }
+          {
+            unique: true,
+            partialFilterExpression: { status: "active" },
+          }
         ),
     },
     {

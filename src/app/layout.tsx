@@ -14,7 +14,7 @@ const inter = Inter({
   display: "swap",
 });
 
-const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lingopdf.in";
+const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.lingopdf.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appBaseUrl),
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: "LingoPDF — German-to-English Vocabulary-Building PDF Reader",
     description:
       "Read German PDFs and build vocabulary in context with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
-    url: "https://lingopdf.in",
+    url: "https://www.lingopdf.in",
     siteName: "LingoPDF",
     type: "website",
   },

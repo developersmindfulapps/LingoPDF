@@ -14,12 +14,12 @@ declare global {
   var _mongoClientPromise: Promise<MongoClient> | undefined;
 }
 
-const uri = process.env.MONGODB_URI;
 const dbName = process.env.MONGODB_DB || "lingo_pdf";
 
 let clientPromise: Promise<MongoClient> | null = null;
 
-if (uri) {
+if (process.env.MONGODB_URI) {
+  const uri = process.env.MONGODB_URI;
   if (process.env.NODE_ENV === "development") {
     if (!global._mongoClientPromise) {
       const client = new MongoClient(uri);
@@ -39,8 +39,22 @@ if (uri) {
  * Throws a clean, safe configuration error if MONGODB_URI is not set.
  */
 export async function getMongoClient(): Promise<MongoClient> {
-  if (!clientPromise) {
+  const currentUri = process.env.MONGODB_URI;
+  if (!currentUri) {
     throw new Error("MONGODB_NOT_CONFIGURED");
+  }
+  if (!clientPromise) {
+    if (process.env.NODE_ENV === "development") {
+      if (!global._mongoClientPromise) {
+        const client = new MongoClient(currentUri);
+        global._mongoClientPromise = client.connect();
+      }
+      clientPromise = global._mongoClientPromise;
+    } else {
+      const client = new MongoClient(currentUri);
+      clientPromise = client.connect();
+    }
+    clientPromise.catch(() => {});
   }
   return clientPromise;
 }

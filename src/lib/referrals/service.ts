@@ -1,5 +1,7 @@
 import crypto from "node:crypto";
 import { Db, ObjectId } from "mongodb";
+import { sendReferralQuotaReachedEmail } from "@/lib/email/resend";
+import { logger } from "@/lib/observability/logger";
 import {
   CommissionDocument,
   getCommissionsCollection,
@@ -179,10 +181,20 @@ export async function getOrCreateReferralProfile(
 ): Promise<ReferralProfileDocument> {
   const referralProfilesCol = await getReferralProfilesCollection(db);
 
-  // 1. Check if user already has a referral profile
-  const existing = await referralProfilesCol.findOne({ userId: user._id });
-  if (existing) {
-    return existing;
+  // 1. Check if user already has an active referral profile, or any profile
+  const existingActive = await referralProfilesCol.findOne({
+    userId: user._id,
+    status: "active",
+  });
+  if (existingActive) {
+    return existingActive;
+  }
+  const existingAny = await referralProfilesCol.findOne(
+    { userId: user._id },
+    { sort: { createdAt: -1 } }
+  );
+  if (existingAny) {
+    return existingAny;
   }
 
   // 2. Derive base prefix strictly from user's display name (not email)
@@ -246,6 +258,18 @@ export async function getOrCreateReferralProfile(
   );
 }
 
+export interface HistoricalReferralCodeSummary {
+  code: string;
+  referralCode: string;
+  status: string;
+  successfulPaidReferrals: number;
+  successfulConversionsCount: number;
+  maxCapacity: number;
+  maxReferralsCap: number;
+  createdAt: string;
+  exhaustedAt: string | null;
+}
+
 export interface CustomerReferralStats {
   referralCode: string;
   shareableUrl: string;
@@ -253,6 +277,9 @@ export interface CustomerReferralStats {
   successfulPaidReferrals: number;
   remainingCapacity: number;
   maxCapacity: number;
+  isExhausted: boolean;
+  canRegenerate: boolean;
+  historicalCodes?: HistoricalReferralCodeSummary[];
   earningsByCurrency: Record<
     SupportedCurrency,
     {
@@ -276,12 +303,14 @@ export async function getCustomerReferralDashboardData(
   const usersCol = await getUsersCollection(db);
   const commissionsCol = await getCommissionsCollection(db);
 
-  const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lingopdf.in";
+  const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.lingopdf.in";
   const shareableUrl = `${appBaseUrl}/r/${profile.referralCode}`;
 
-  const [registeredCount, userCommissions] = await Promise.all([
+  const referralProfilesCol = await getReferralProfilesCollection(db);
+  const [registeredCount, userCommissions, allProfiles] = await Promise.all([
     usersCol.countDocuments({ referredByUserId: user._id }),
     commissionsCol.find({ referrerUserId: user._id }).toArray(),
+    referralProfilesCol.find({ userId: user._id }).sort({ createdAt: -1 }).toArray(),
   ]);
 
   const earningsByCurrency: CustomerReferralStats["earningsByCurrency"] = {
@@ -328,6 +357,23 @@ export async function getCustomerReferralDashboardData(
       profile.pendingReservedCount
   );
 
+  const isExhausted =
+    profile.status === "exhausted" ||
+    profile.successfulConversionsCount >= profile.maxReferralsCap;
+  const canRegenerate = isExhausted;
+
+  const historicalCodes: HistoricalReferralCodeSummary[] = allProfiles.map((p) => ({
+    code: p.referralCode,
+    referralCode: p.referralCode,
+    status: p.status,
+    successfulPaidReferrals: p.successfulConversionsCount,
+    successfulConversionsCount: p.successfulConversionsCount,
+    maxCapacity: p.maxReferralsCap,
+    maxReferralsCap: p.maxReferralsCap,
+    createdAt: p.createdAt ? p.createdAt.toISOString() : "",
+    exhaustedAt: p.exhaustedAt ? p.exhaustedAt.toISOString() : null,
+  }));
+
   return {
     referralCode: profile.referralCode,
     shareableUrl,
@@ -335,6 +381,9 @@ export async function getCustomerReferralDashboardData(
     successfulPaidReferrals: profile.successfulConversionsCount,
     remainingCapacity,
     maxCapacity: profile.maxReferralsCap,
+    isExhausted,
+    canRegenerate,
+    historicalCodes,
     earningsByCurrency,
   };
 }
@@ -492,6 +541,25 @@ export async function finalizeCapturedReferralRedemption(
     throw new Error("REFERRAL_RESERVATION_NOT_FOUND");
   }
 
+  // If this purchase completed the 50-redemption quota, mark the code as exhausted
+  if (
+    updatedProfile.successfulConversionsCount >= updatedProfile.maxReferralsCap &&
+    updatedProfile.status !== "exhausted"
+  ) {
+    await profilesCol.updateOne(
+      { _id: updatedProfile._id },
+      {
+        $set: {
+          status: "exhausted",
+          exhaustedAt: capturedAt,
+          updatedAt: capturedAt,
+        },
+      }
+    );
+    updatedProfile.status = "exhausted";
+    updatedProfile.exhaustedAt = capturedAt;
+  }
+
   // Calculate 10% commission on actual collected amount
   const commissionAmount = Math.round(paidAmountMinor * 0.1);
   const holdUntil = new Date(capturedAt.getTime() + 72 * 60 * 60 * 1000);
@@ -616,4 +684,212 @@ export function calculateReferralPurchasePricing(
     referralProfileId,
     commissionAmountSubunits,
   };
+}
+
+/**
+ * Triggers an idempotent, durable quota-completion email notification when a code reaches 50 redemptions.
+ * Guaranteed to execute at most once per referral code via atomic status transition.
+ * Email delivery failures are safely recorded and do not fail the purchase.
+ */
+export async function triggerReferralQuotaNotification(
+  db: Db,
+  profile: ReferralProfileDocument,
+  now = new Date()
+): Promise<void> {
+  const profilesCol = await getReferralProfilesCollection(db);
+
+  // 1. Atomically claim notification execution rights
+  const claim = await profilesCol.findOneAndUpdate(
+    {
+      _id: profile._id,
+      quotaNotificationStatus: { $in: [null, undefined] },
+    },
+    {
+      $set: {
+        quotaNotificationStatus: "pending",
+        updatedAt: now,
+      },
+    },
+    { returnDocument: "after" }
+  );
+
+  if (!claim) {
+    // Already claimed or previously sent (e.g. duplicate webhook replay); exit safely
+    return;
+  }
+
+  // 2. Retrieve referrer email and name
+  try {
+    const usersCol = await getUsersCollection(db);
+    const referrer = await usersCol.findOne({ _id: profile.userId });
+    if (!referrer || !referrer.email) {
+      await profilesCol.updateOne(
+        { _id: profile._id },
+        {
+          $set: {
+            quotaNotificationStatus: "failed",
+            quotaNotificationError: "Referrer user or email not found",
+            updatedAt: new Date(),
+          },
+        }
+      );
+      return;
+    }
+
+    // 3. Send notification email via Resend
+    const sendResult = await sendReferralQuotaReachedEmail({
+      to: referrer.email,
+      name: referrer.name || undefined,
+      referralCode: profile.referralCode,
+    });
+
+    if (sendResult.success) {
+      await profilesCol.updateOne(
+        { _id: profile._id },
+        {
+          $set: {
+            quotaNotificationStatus: "sent",
+            quotaNotificationSentAt: new Date(),
+            quotaNotificationMessageId: sendResult.messageId || null,
+            updatedAt: new Date(),
+          },
+        }
+      );
+    } else {
+      await profilesCol.updateOne(
+        { _id: profile._id },
+        {
+          $set: {
+            quotaNotificationStatus: "failed",
+            quotaNotificationError: sendResult.error || "Email delivery failed",
+            updatedAt: new Date(),
+          },
+        }
+      );
+      logger.error("referral_quota_email_delivery_failed", {
+        profileId: profile._id.toString(),
+        code: sendResult.code,
+      });
+    }
+  } catch (err: unknown) {
+    const errorMsg = err instanceof Error ? err.message : String(err);
+    logger.error("referral_quota_notification_exception", {
+      profileId: profile._id.toString(),
+      error: errorMsg,
+    });
+    await profilesCol.updateOne(
+      { _id: profile._id },
+      {
+        $set: {
+          quotaNotificationStatus: "failed",
+          quotaNotificationError: errorMsg,
+          updatedAt: new Date(),
+        },
+      }
+    ).catch(() => {});
+  }
+}
+
+/**
+ * Regenerates a new referral code for an existing referrer who has fully exhausted their current code.
+ * Strict Server Enforcement:
+ * - Current code must have completed all 50 successful redemptions.
+ * - Previous code is marked as permanently exhausted.
+ * - Only one active code may exist per referrer.
+ * - Race conditions and concurrent requests are strictly prevented by database partial unique index.
+ */
+export async function regenerateReferralCode(
+  db: Db,
+  user: UserDocument,
+  now = new Date()
+): Promise<ReferralProfileDocument> {
+  const profilesCol = await getReferralProfilesCollection(db);
+
+  // 1. Verify user's current referral status:
+  // Must NOT have any active code that hasn't completed all 50 redemptions
+  const activeProfiles = await profilesCol
+    .find({ userId: user._id, status: { $ne: "exhausted" } })
+    .toArray();
+
+  for (const p of activeProfiles) {
+    if (p.successfulConversionsCount < p.maxReferralsCap) {
+      throw new Error(
+        "QUOTA_NOT_EXHAUSTED: Current referral code has not reached its limit of 50 successful redemptions."
+      );
+    }
+    // If it reached 50 but status wasn't marked "exhausted" yet, transition it now
+    if (p.status !== "exhausted") {
+      await profilesCol.updateOne(
+        { _id: p._id },
+        { $set: { status: "exhausted", exhaustedAt: p.exhaustedAt || now, updatedAt: now } }
+      );
+    }
+  }
+
+  // Double check no active code remains
+  const activeCheck = await profilesCol.findOne({
+    userId: user._id,
+    status: { $ne: "exhausted" },
+  });
+  if (activeCheck) {
+    throw new Error(
+      "ACTIVE_CODE_ALREADY_EXISTS: You already have an active referral code."
+    );
+  }
+
+  // 2. Generate a new unique code [PREFIX][4_DIGITS] with collision handling
+  const prefix = deriveReferralPrefix(user.name);
+  let attempts = 0;
+  const maxAttempts = 15;
+
+  while (attempts < maxAttempts) {
+    attempts++;
+    const candidateCode = `${prefix}${generateFourDigitSuffix()}`;
+    const qualifyingPurchaseId = new ObjectId();
+
+    const newProfile: ReferralProfileDocument = {
+      _id: new ObjectId(),
+      userId: user._id,
+      qualifyingPurchaseId,
+      referralCode: candidateCode,
+      status: "active",
+      maxReferralsCap: MAX_SUCCESSFUL_REFERRALS_PER_USER,
+      pendingReservedCount: 0,
+      successfulConversionsCount: 0,
+      payoutMethod: "unset",
+      payoutDetailsEncryptedOrRef: null,
+      createdAt: now,
+      updatedAt: now,
+    };
+
+    try {
+      await profilesCol.insertOne(newProfile);
+      return newProfile;
+    } catch (err: unknown) {
+      const isDuplicateKey =
+        typeof err === "object" &&
+        err !== null &&
+        "code" in err &&
+        (err as { code?: number }).code === 11000;
+
+      if (!isDuplicateKey) {
+        throw err;
+      }
+
+      // If duplicate key was on userId, another concurrent request already created the new code
+      const existingActive = await profilesCol.findOne({
+        userId: user._id,
+        status: { $ne: "exhausted" },
+      });
+      if (existingActive) {
+        return existingActive;
+      }
+
+      // If duplicate was on candidateCode, loop around for another 4-digit suffix
+    }
+  }
+
+  throw new Error(
+    "Failed to generate a unique referral code after multiple attempts. Please try again."
+  );
 }

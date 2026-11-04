@@ -7,38 +7,37 @@ import { Footer } from "@/components/Footer";
 export const metadata: Metadata = {
   title: "Privacy Policy — LingoPDF",
   description:
-    "Learn how LingoPDF approaches privacy, local-first document processing, browser extension operations, account authentication, and data practices.",
+    "Learn how LingoPDF handles information with local-first document processing, browser extension operations, and account authentication.",
   alternates: {
-    canonical: "https://lingopdf.in/privacy",
+    canonical: "https://www.lingopdf.in/privacy",
   },
   openGraph: {
     title: "Privacy Policy — LingoPDF",
     description:
       "Plain-English explanation of our local-first document processing principles, extension functionality, implemented account systems, and data handling.",
-    url: "https://lingopdf.in/privacy",
+    url: "https://www.lingopdf.in/privacy",
     type: "website",
   },
 };
 
 const SECTIONS = [
-  { id: "introduction", title: "1. Introduction and Scope" },
-  { id: "information-we-collect", title: "2. Information We Collect" },
-  { id: "account-authentication", title: "3. Account Registration and Authentication" },
-  { id: "payments-refunds", title: "4. Payments and Refunds (Not Yet Implemented)" },
-  { id: "how-we-use-information", title: "5. How the Website Uses Information" },
-  { id: "extension-local-processing", title: "6. Extension Functionality and Local PDF Processing" },
-  { id: "ocr-dictionary-lookup", title: "7. OCR and Dictionary Lookup" },
-  { id: "license-device-management", title: "8. License Activation and Device Management (Planned)" },
-  { id: "usage-limits-logs", title: "9. Usage Limits and Operational Quota" },
-  { id: "cookies-technologies", title: "10. Cookies and Similar Technologies" },
-  { id: "third-party-providers", title: "11. Third-Party Service Providers" },
-  { id: "data-retention", title: "12. Data Retention" },
-  { id: "data-security", title: "13. Data Security" },
-  { id: "international-transfers", title: "14. International Data Transfers" },
-  { id: "childrens-privacy", title: "15. Children's Privacy" },
-  { id: "user-rights", title: "16. User Privacy Rights and Choices" },
-  { id: "policy-updates", title: "17. Policy Updates" },
-  { id: "contact-information", title: "18. Contact Information" },
+  { id: "information-we-collect", title: "1. Information We Collect" },
+  { id: "account-authentication", title: "2. Account Registration and Authentication" },
+  { id: "payments-purchases", title: "3. Payments and Purchases" },
+  { id: "referral-programme", title: "4. Referral Programme" },
+  { id: "extension-local-processing", title: "5. Extension Functionality and Local PDF Processing" },
+  { id: "ocr-dictionary-data", title: "6. OCR and Dictionary Data" },
+  { id: "licence-activation", title: "7. Licence Activation and Device Management" },
+  { id: "usage-limits", title: "8. Usage Limits and Commercial Access" },
+  { id: "cookies-technologies", title: "9. Cookies and Similar Technologies" },
+  { id: "third-party-providers", title: "10. Third-Party Service Providers" },
+  { id: "data-retention", title: "11. Data Retention" },
+  { id: "data-security", title: "12. Data Security" },
+  { id: "international-transfers", title: "13. International Data Transfers" },
+  { id: "childrens-privacy", title: "14. Children's Privacy" },
+  { id: "privacy-rights", title: "15. Your Privacy Rights and Choices" },
+  { id: "policy-changes", title: "16. Changes to This Policy" },
+  { id: "contact-information", title: "17. Contact Information" },
 ];
 
 export default function PrivacyPolicyPage() {
@@ -49,16 +48,34 @@ export default function PrivacyPolicyPage() {
       <main className="flex-1 py-12 sm:py-16 lg:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="mb-12 border-b border-[var(--color-soft-sage)] pb-8">
+          <div id="overview" className="scroll-mt-24 mb-12 border-b border-[var(--color-soft-sage)] pb-8">
             <span className="text-xs sm:text-sm font-bold uppercase tracking-widest text-[var(--color-terracotta)] mb-3 block">
               Legal Documentation
             </span>
             <h1 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--color-forest-green)] mb-4">
               Privacy Policy
             </h1>
-            <p className="text-sm sm:text-base text-[var(--color-charcoal)]/70 font-sans">
-              Last updated: October 2026 • Operational for https://lingopdf.in
+            <p className="text-sm sm:text-base text-[var(--color-charcoal)]/70 font-sans mb-6">
+              Last updated: November 4, 2026 • Operational for https://www.lingopdf.in
             </p>
+            <div className="space-y-4 text-sm sm:text-base text-[var(--color-charcoal)]/90 leading-relaxed font-sans">
+              <p>
+                This Privacy Policy explains how LingoPDF handles information when you visit{" "}
+                <a href="https://www.lingopdf.in" className="text-[var(--color-forest-green)] underline">
+                  https://www.lingopdf.in
+                </a>
+                , create or use an account, contact our support team, or use the LingoPDF browser extension.
+              </p>
+              <p>
+                LingoPDF is designed around local-first document processing. The current extension processes
+                PDF documents, text selection, dictionary lookups and OCR locally in your browser. It does not
+                upload your PDF documents or their contents to LingoPDF servers for these functions.
+              </p>
+              <p>
+                This Policy distinguishes between currently operating services and planned commercial
+                features that are not yet active.
+              </p>
+            </div>
           </div>
 
           {/* Table of Contents */}
@@ -85,409 +102,411 @@ export default function PrivacyPolicyPage() {
 
           {/* Document Content */}
           <div className="space-y-12 text-[var(--color-charcoal)]/90 font-sans leading-relaxed text-sm sm:text-base">
-            {/* 1. Introduction and Scope */}
-            <section id="introduction" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                1. Introduction and Scope
-              </h2>
-              <p>
-                Welcome to LingoPDF. This Privacy Policy explains how information is handled when you
-                visit our website (<strong>https://lingopdf.in</strong>), interact with our account
-                services, or use the LingoPDF browser extension software, including the LingoPDF PDF
-                Reader for German to English.
-              </p>
-              <p>
-                LingoPDF operates on a <strong>local-first architecture</strong>: our reading tools are
-                engineered to execute vocabulary definitions, grammatical parsing, and optical
-                character recognition (OCR) directly inside your personal browser sandbox rather than
-                streaming your personal reading materials to remote cloud servers.
-              </p>
-              <p>
-                This document clearly describes our active practices and implemented features, while
-                accurately distinguishing future capabilities (such as commercial payment processing
-                and device seat management) that will launch in upcoming project phases.
-              </p>
-            </section>
-
-            {/* 2. Information We Collect */}
+            {/* 1. Information We Collect */}
             <section id="information-we-collect" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                2. Information We Collect
+                1. Information We Collect
               </h2>
-              <p>
-                Depending on how you interact with LingoPDF, we collect and process the following
-                categories of information:
-              </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <strong>Account &amp; Profile Details:</strong> When you register an account, we
-                  collect your email address and optional display name.
-                </li>
-                <li>
-                  <strong>Authentication Credentials &amp; Tokens:</strong> We store passwords strictly
-                  in cryptographically hashed form (using Argon2id). Single-use tokens for email
-                  verification and password resets are stored strictly as SHA-256 hashes with short-lived
-                  expiration windows.
-                </li>
-                <li>
-                  <strong>Session Metadata:</strong> When you sign in, we record session timestamps,
-                  your browser User-Agent string, and IP address for account security and session
-                  management.
-                </li>
-                <li>
-                  <strong>Website Logs &amp; Diagnostics:</strong> Standard web server access logs (such
-                  as IP address, request method, requested URL, response code, and timestamp) collected
-                  by our hosting infrastructure to monitor availability and defend against abuse.
-                </li>
-                <li>
-                  <strong>Support Communications:</strong> When you email our team at{" "}
+              <p>Depending on how you use LingoPDF, we may process the following information:</p>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Account information
+                </h3>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li>Email address and optional display name supplied during registration.</li>
+                  <li>Passwords, stored as secure cryptographic hashes rather than plaintext.</li>
+                  <li>Email verification and password-reset token hashes and their expiration information.</li>
+                  <li>Account status, verification status and account timestamps.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Authentication and security information
+                </h3>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li>Hashed session identifiers and session expiration information.</li>
+                  <li>Session creation and activity timestamps.</li>
+                  <li>
+                    Browser User-Agent information and IP address where collected for security, abuse prevention
+                    and operational purposes.
+                  </li>
+                  <li>Rate-limit and security-event records.</li>
+                </ul>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Referral information
+                </h3>
+                <p>If you use the referral programme, we may process:</p>
+                <ul className="list-disc pl-5 space-y-1.5">
+                  <li>Your referral code and referral link.</li>
+                  <li>The referral code used during registration or purchase.</li>
+                  <li>Referral attribution and the associated account relationship.</li>
+                  <li>Referral activity and programme eligibility information.</li>
+                </ul>
+                <p className="text-xs sm:text-sm text-[var(--color-charcoal)]/75">
+                  Referral attribution does not itself mean that a purchase has occurred or that a commission has been earned.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Support communications
+                </h3>
+                <p>
+                  If you contact{" "}
                   <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
                     support@lingopdf.in
                   </a>
-                  , we retain your email address and message contents to assist you.
-                </li>
-              </ul>
-              <p>
-                We do not track the documents you open in the extension, we do not log your reading
-                history, and we do not sell or monetize personal data.
+                  , we process your email address, message and any information you choose to provide so that we can respond.
+                </p>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <h3 className="font-heading text-base sm:text-lg font-semibold text-[var(--color-forest-green)]">
+                  Website and infrastructure logs
+                </h3>
+                <p>
+                  Our hosting and infrastructure providers may process technical information such as request
+                  URLs, IP addresses, timestamps, response codes and diagnostic information to operate, secure
+                  and troubleshoot the website.
+                </p>
+              </div>
+
+              <p className="font-semibold text-[var(--color-forest-green)] pt-2">
+                We do not sell personal information.
               </p>
             </section>
 
-            {/* 3. Account Registration and Authentication */}
+            {/* 2. Account Registration and Authentication */}
             <section id="account-authentication" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                3. Account Registration and Authentication
+                2. Account Registration and Authentication
               </h2>
               <p>
-                User accounts are fully implemented on https://lingopdf.in. Account creation allows you
-                to register credentials that will be used to manage your profile and future licenses.
-              </p>
-              <p>When interacting with our authentication system:</p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <strong>Registration:</strong> You supply an email address, password, and optional name.
-                  Passwords are automatically hashed before persistence using the industry-standard
-                  Argon2id hashing algorithm.
-                </li>
-                <li>
-                  <strong>Email Verification:</strong> A single-use verification token is generated, hashed
-                  using SHA-256, and stored with a 24-hour expiration. An email containing the activation
-                  link is sent via our transactional email provider (Resend).
-                </li>
-                <li>
-                  <strong>Sessions:</strong> Successful login creates an opaque 32-byte session token stored
-                  in an HttpOnly, secure cookie (<code>lingopdf_session</code>), with the token hash stored
-                  in our database. Sessions expire after 30 days.
-                </li>
-                <li>
-                  <strong>Password Resets:</strong> Reset requests generate single-use, 1-hour expiration
-                  tokens sent via email. Upon completing a reset, the token is consumed immediately and all
-                  existing active sessions across all devices are automatically revoked.
-                </li>
-              </ul>
-            </section>
-
-            {/* 4. Payments and Refunds (Not Yet Implemented) */}
-            <section id="payments-refunds" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                4. Payments and Refunds (Not Yet Implemented)
-              </h2>
-              <p>
-                <strong>Payment processing and commercial checkout are not currently active on this website.</strong>{" "}
-                We do not currently collect, process, or store credit cards, debit cards, bank account
-                numbers, or billing information.
-              </p>
-              <p>
-                When commercial purchasing launches (Phase 7A), all monetary transactions will be handled
-                exclusively by an external, PCI-DSS compliant third-party payment processor. LingoPDF will
-                never store full credit card numbers on our servers.
-              </p>
-              <p>
-                <strong>Refund Policy:</strong> All paid licenses will include a contractual{" "}
-                <strong>three (3) calendar day money-back guarantee</strong> calculated from the exact date
-                and time of your original purchase. Refund requests must be directed to{" "}
-                <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
-                  support@lingopdf.in
+                LingoPDF accounts are operated through{" "}
+                <a href="https://www.lingopdf.in" className="text-[var(--color-forest-green)] underline">
+                  https://www.lingopdf.in
                 </a>
-                . Upon refund issuance, the associated license key will be deactivated. This contractual
-                guarantee operates in addition to, and does not limit or waive, any non-excludable statutory
-                consumer rights available in your jurisdiction.
+                .
+              </p>
+              <p>Our authentication system currently uses:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Argon2id password hashing.</li>
+                <li>Hashed, single-use email verification and password-reset tokens.</li>
+                <li>Email verification links sent through Resend.</li>
+                <li>An opaque authentication session token held in a secure, HttpOnly cookie.</li>
+                <li>Server-side session validation and expiration.</li>
+              </ul>
+              <p>
+                Password-reset tokens are time-limited. Completing a password reset revokes existing active sessions.
+              </p>
+              <p>
+                Please keep your account credentials confidential and contact us if you suspect unauthorized access.
               </p>
             </section>
 
-            {/* 5. How the Website Uses Information */}
-            <section id="how-we-use-information" className="scroll-mt-24 space-y-4">
+            {/* 3. Payments and Purchases */}
+            <section id="payments-purchases" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                5. How the Website Uses Information
+                3. Payments and Purchases
               </h2>
-              <p>We process collected information strictly for operational and security purposes:</p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>To register, authenticate, and maintain your account profile.</li>
-                <li>To dispatch essential transactional emails (verification links and password reset requests).</li>
-                <li>To secure our authentication routes using IP-based rate limiting against credential abuse.</li>
-                <li>To deliver web pages, assets, and documentation reliably to your client device.</li>
-                <li>To respond promptly to support inquiries sent to our support mailbox.</li>
-              </ul>
-              <p>We do not sell personal data to third parties, nor do we run behavioral ad-tracking scripts.</p>
+              <p>Online checkout and payment processing are not currently active.</p>
+              <p>
+                LingoPDF does not currently collect or process payment-card or bank-account details through its website.
+              </p>
+              <p>
+                When commercial checkout becomes operational, payments will be handled through an external payment
+                service provider. The provider may process payment and transaction information under its own
+                privacy policy and terms.
+              </p>
+              <p>
+                LingoPDF may retain purchase-related records needed to provide purchased products, manage
+                entitlements, respond to support requests, administer refunds and comply with applicable legal obligations.
+              </p>
+              <p>
+                We do not intend to store full payment-card numbers or card security codes on LingoPDF servers.
+              </p>
             </section>
 
-            {/* 6. Extension Functionality and Local PDF Processing */}
+            {/* 4. Referral Programme */}
+            <section id="referral-programme" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                4. Referral Programme
+              </h2>
+              <p>
+                LingoPDF supports referral-code attribution. When a user registers using a referral code, we may
+                associate that registration with the referring account.
+              </p>
+              <p>
+                The referral system may also process redemption, discount, commission and payout records as commercial
+                purchasing features become operational.
+              </p>
+              <p>
+                Referral attribution information is used to administer the programme, prevent abuse and maintain
+                accurate records. A referral registration alone does not create a paid purchase or an earned commission.
+              </p>
+              <p>Payment and payout processing are not currently active.</p>
+            </section>
+
+            {/* 5. Extension Functionality and Local PDF Processing */}
             <section id="extension-local-processing" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                6. Extension Functionality and Local PDF Processing
+                5. Extension Functionality and Local PDF Processing
+              </h2>
+              <p>The LingoPDF German-to-English PDF Reader is designed to process documents locally.</p>
+              <p>In the current extension:</p>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>PDF documents are opened and processed in the browser.</li>
+                <li>PDF pages and text are rendered locally.</li>
+                <li>Selected German vocabulary is looked up using dictionary data bundled with the extension.</li>
+                <li>OCR for supported scanned documents runs locally using bundled software and language data.</li>
+                <li>Document contents are not uploaded to LingoPDF servers for these reading and lookup functions.</li>
+              </ul>
+              <p>
+                LingoPDF does not intentionally collect a history of the PDF files you open, the pages you read or
+                the words you select.
+              </p>
+              <p>
+                The extension&apos;s local processing design does not mean that your browser, operating system or
+                other installed software cannot independently collect information. Their handling of information is
+                governed by their respective providers.
+              </p>
+            </section>
+
+            {/* 6. OCR and Dictionary Data */}
+            <section id="ocr-dictionary-data" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                6. OCR and Dictionary Data
+              </h2>
+              <p>Dictionary lookup and OCR functionality currently operate locally within the extension.</p>
+              <p>
+                The extension uses bundled dictionary datasets and local processing resources. It does not send
+                selected words, extracted PDF text or scanned page images to a LingoPDF cloud translation or AI
+                service for these functions.
+              </p>
+            </section>
+
+            {/* 7. Licence Activation and Device Management */}
+            <section id="licence-activation" className="scroll-mt-24 space-y-4">
+              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
+                7. Licence Activation and Device Management
               </h2>
               <p>
-                The LingoPDF browser extension is designed with a core commitment to user document
-                confidentiality:
+                Commercial licence activation and device management are planned features and are not currently operational.
               </p>
+              <p>When introduced, these features may require:</p>
               <ul className="list-disc pl-5 space-y-2">
+                <li>A licence or activation identifier.</li>
+                <li>Account and purchase verification.</li>
+                <li>A pseudonymous device or installation identifier.</li>
+                <li>Activation, deactivation and licence-status records.</li>
                 <li>
-                  <strong>Local Document Sandboxing:</strong> When you open a PDF document in your
-                  browser, the entire document file is parsed and rendered locally within your browser
-                  tab.
-                </li>
-                <li>
-                  <strong>Zero Document Uploads:</strong> LingoPDF does not transmit your PDF pages, text
-                  extracts, scanned images, or document contents to remote servers or cloud AI services
-                  for vocabulary lookups.
-                </li>
-                <li>
-                  <strong>No Reading History Dossiers:</strong> We do not log which files you read, how long
-                  you spend on individual pages, or the specific vocabulary words you select.
+                  Limited communication with LingoPDF servers to verify licence status and manage the permitted device.
                 </li>
               </ul>
+              <p>
+                The intended commercial policy is one active device per purchase. Further details will be disclosed
+                when the activation system is implemented.
+              </p>
             </section>
 
-            {/* 7. OCR and Dictionary Lookup */}
-            <section id="ocr-dictionary-lookup" className="scroll-mt-24 space-y-4">
+            {/* 8. Usage Limits and Commercial Access */}
+            <section id="usage-limits" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                7. OCR and Dictionary Lookup
+                8. Usage Limits and Commercial Access
               </h2>
               <p>
-                All linguistic and optical recognition tools in the LingoPDF extension execute locally:
+                LingoPDF does not offer a permanent five-lookup-per-day free tier or a time-limited free trial as
+                part of its approved commercial model.
               </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <strong>Local Lexical Datasets:</strong> Comprehensive German–English lexical datasets,
-                  definition mappings, and grammatical inflections reside within the extension&apos;s
-                  packaged assets, enabling sub-50ms lookup times without remote network requests.
-                </li>
-                <li>
-                  <strong>Client-Side OCR:</strong> For scanned or image-based PDF documents, optical
-                  character recognition runs entirely using client-side WebAssembly / JavaScript compute
-                  on your computer. Image bitmaps are processed in local memory and are never uploaded
-                  to an external server.
-                </li>
-              </ul>
+              <p>
+                The current extension build does not yet contain the planned commercial payment and
+                licence-enforcement system. Access arrangements for testing or distribution should not be
+                interpreted as a permanent free entitlement or a commercial licence.
+              </p>
+              <p>Commercial access controls will be described when they become operational.</p>
             </section>
 
-            {/* 8. License Activation and Device Management (Planned) */}
-            <section id="license-device-management" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                8. License Activation and Device Management (Planned)
-              </h2>
-              <p>
-                Commercial license activation and device management are <strong>planned features</strong>{" "}
-                scheduled for introduction in Phase 7A. They are not currently operational.
-              </p>
-              <p>
-                When implemented, commercial licensing will operate under the following privacy principles:
-              </p>
-              <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  A brief network call during initial license activation will verify the validity of your
-                  license key.
-                </li>
-                <li>
-                  A pseudonymized cryptographic device identifier will enforce the approved seat limit of
-                  a <strong>maximum of two (2) active browser installations or personal devices</strong> per
-                  lifetime license.
-                </li>
-                <li>
-                  Following successful one-time activation, paid functionality is engineered to work
-                  completely offline without requiring continuous network connectivity or periodic
-                  heartbeat pings.
-                </li>
-              </ul>
-            </section>
-
-            {/* 9. Usage Limits and Operational Quota */}
-            <section id="usage-limits-logs" className="scroll-mt-24 space-y-4">
-              <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                9. Usage Limits and Operational Quota
-              </h2>
-              <p>
-                LingoPDF offers a permanent free tier of <strong>five (5) word lookups per calendar day</strong>.
-                There is no time-based free trial (such as a 3-day or 7-day trial).
-              </p>
-              <p>
-                Based on our actual extension architecture, this daily quota is tracked and stored
-                <strong> locally within your browser storage</strong> (using extension storage / LocalStorage)
-                associated with calendar dates. Daily lookup counts are not sent to or stored on remote
-                servers.
-              </p>
-            </section>
-
-            {/* 10. Cookies and Similar Technologies */}
+            {/* 9. Cookies and Similar Technologies */}
             <section id="cookies-technologies" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                10. Cookies and Similar Technologies
+                9. Cookies and Similar Technologies
               </h2>
               <p>
-                We use strictly necessary cookies to operate our authenticated user services and maintain
-                functional site preferences:
+                LingoPDF uses strictly necessary technologies to operate its website and authenticated account services.
               </p>
+              <p>These include:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  <code>lingopdf_session</code>: Strictly necessary authentication cookie. Generated upon
-                  successful login, configured with <code>HttpOnly</code>, <code>Secure</code> in production,
-                  <code>SameSite=Lax</code>, and a 30-day lifetime. Used solely to keep you signed in.
+                  <code>lingopdf_session</code>: An authentication cookie used to maintain a signed-in session. It is
+                  configured with security attributes including HttpOnly, SameSite and Secure in production.
                 </li>
                 <li>
-                  <code>lingopdf_region</code>: Functional preference cookie used to remember your manual
-                  currency and regional pricing selection across page visits.
+                  <strong>Security and rate-limit mechanisms:</strong> Server-side controls used to protect account
+                  and website endpoints.
                 </li>
               </ul>
               <p>
-                We do not use third-party advertising cookies, cross-site tracker beacons, or canvas
-                fingerprinting technologies.
+                Our website infrastructure may also use technical mechanisms necessary for hosting, security and
+                reliable delivery.
+              </p>
+              <p>
+                We do not intentionally use behavioural advertising trackers or sell personal information for
+                advertising purposes.
               </p>
             </section>
 
-            {/* 11. Third-Party Service Providers */}
+            {/* 10. Third-Party Service Providers */}
             <section id="third-party-providers" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                11. Third-Party Service Providers
+                10. Third-Party Service Providers
               </h2>
               <p>
-                To provide dependable web services, we engage the following infrastructure providers:
+                LingoPDF currently relies on infrastructure providers to operate its website and account services.
+                These include:
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  <strong>MongoDB Atlas:</strong> Managed cloud database infrastructure used to store
-                  registered account records, hashed credentials, verification hashes, and session
-                  records with network encryption in transit and at rest.
+                  <strong>MongoDB Atlas:</strong> Account, authentication, session and application data storage.
                 </li>
                 <li>
-                  <strong>Resend:</strong> Transactional email service provider used to deliver account
-                  verification links and password reset instructions.
+                  <strong>Resend:</strong> Transactional email delivery, including verification and password-reset
+                  messages.
                 </li>
                 <li>
-                  <strong>Cloud Hosting / Edge Infrastructure (e.g. Vercel):</strong> Web application
-                  hosting, static asset caching, and serverless execution for web endpoints.
+                  <strong>Vercel:</strong> Website hosting, application delivery and server-side execution.
                 </li>
               </ul>
               <p>
-                Each provider processes only the minimum data strictly necessary to execute their designated
-                infrastructure service.
+                These providers may process information on our behalf to deliver their services and are subject to
+                their own privacy and security practices.
+              </p>
+              <p>
+                When payment processing becomes operational, the relevant payment provider will be identified in the
+                applicable purchasing information.
               </p>
             </section>
 
-            {/* 12. Data Retention */}
+            {/* 11. Data Retention */}
             <section id="data-retention" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                12. Data Retention
+                11. Data Retention
               </h2>
-              <p>We adhere to data minimization principles across all systems:</p>
+              <p>
+                We retain information for as long as reasonably necessary for the purposes described in this Policy,
+                subject to applicable legal requirements.
+              </p>
+              <p>Examples include:</p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  <strong>User Accounts:</strong> Account profiles and hashed credentials are retained for
-                  as long as your account remains active, or until you request account deletion.
+                  <strong>Account information:</strong> Retained while an account remains active and as needed to
+                  handle account-related obligations.
                 </li>
                 <li>
-                  <strong>Sessions:</strong> Active sessions expire automatically after 30 days of inactivity.
+                  <strong>Authentication sessions:</strong> Retained until expiration or revocation.
                 </li>
                 <li>
-                  <strong>Tokens:</strong> Email verification tokens expire after 24 hours. Password reset
-                  tokens expire after 1 hour. Both are deleted immediately upon consumption.
+                  <strong>Verification and password-reset tokens:</strong> Time-limited and invalidated after use or
+                  expiration.
                 </li>
                 <li>
-                  <strong>Server Logs:</strong> Web hosting access logs are rotated and purged on standard
-                  hosting provider maintenance schedules.
+                  <strong>Security records:</strong> Retained as reasonably necessary for security, abuse prevention
+                  and troubleshooting.
                 </li>
                 <li>
-                  <strong>Support Inquiries:</strong> Direct customer email correspondence is retained only
-                  as long as needed to resolve your query and maintain record continuity.
+                  <strong>Support correspondence:</strong> Retained as necessary to resolve and document support
+                  matters.
+                </li>
+                <li>
+                  <strong>Referral records:</strong> Retained as necessary to administer referral attribution and
+                  programme integrity.
+                </li>
+                <li>
+                  <strong>Financial, purchase and dispute records:</strong> When commercial transactions become
+                  operational, relevant records may be retained for accounting, tax, fraud prevention, chargeback
+                  handling and legal compliance.
                 </li>
               </ul>
+              <p>
+                We may retain certain records after an account is closed where necessary to comply with legal
+                obligations, resolve disputes or protect our legitimate interests.
+              </p>
             </section>
 
-            {/* 13. Data Security */}
+            {/* 12. Data Security */}
             <section id="data-security" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                13. Data Security
+                12. Data Security
               </h2>
-              <p>We apply robust modern security controls across our platform:</p>
+              <p>We use technical and organisational safeguards designed to protect information, including:</p>
               <ul className="list-disc pl-5 space-y-2">
-                <li>
-                  <strong>Password Security:</strong> Passwords are hashed using the memory-hard Argon2id
-                  algorithm with unique per-user salts. Plaintext passwords are never saved.
-                </li>
-                <li>
-                  <strong>Token Hashing:</strong> Security tokens (email verification and password resets)
-                  are stored only as cryptographic SHA-256 hashes. If the database were compromised, raw
-                  tokens cannot be retrieved.
-                </li>
-                <li>
-                  <strong>Transit Encryption:</strong> All public website routes enforce HTTPS with modern
-                  TLS encryption.
-                </li>
-                <li>
-                  <strong>Cookie Hardening:</strong> Authentication cookies use <code>HttpOnly</code> and{" "}
-                  <code>Secure</code> flags with <code>SameSite=Lax</code> to protect against cross-site
-                  scripting (XSS) and cross-site request forgery (CSRF).
-                </li>
-                <li>
-                  <strong>Abuse Prevention:</strong> Public authentication endpoints (login, register,
-                  password reset, verification) enforce IP-based rate limiting to protect against brute-force
-                  attacks.
-                </li>
+                <li>Password hashing using Argon2id.</li>
+                <li>Cryptographic hashing of authentication tokens.</li>
+                <li>HTTPS for public website communications.</li>
+                <li>Secure authentication-cookie settings.</li>
+                <li>Server-side authorization checks.</li>
+                <li>Rate limiting and abuse-prevention controls.</li>
+                <li>Access restrictions for administrative functions.</li>
               </ul>
+              <p>
+                No online service can guarantee absolute security. Users should use strong, unique passwords and
+                protect their account credentials.
+              </p>
             </section>
 
-            {/* 14. International Data Transfers */}
+            {/* 13. International Data Transfers */}
             <section id="international-transfers" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                14. International Data Transfers
+                13. International Data Transfers
               </h2>
               <p>
-                Our hosting infrastructure, database nodes (MongoDB Atlas), and email dispatch systems
-                (Resend) may operate in secure data center locations globally. By using https://lingopdf.in
-                and creating an account, you acknowledge that your information may be transferred to and
-                processed in these facilities in accordance with this Privacy Policy.
+                Our infrastructure providers may process information in data centres located outside your country of
+                residence.
+              </p>
+              <p>
+                Where information is transferred internationally, we will take steps required by applicable
+                data-protection laws and the arrangements governing our service providers.
               </p>
             </section>
 
-            {/* 15. Children's Privacy */}
+            {/* 14. Children's Privacy */}
             <section id="childrens-privacy" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                15. Children&apos;s Privacy
+                14. Children&apos;s Privacy
               </h2>
               <p>
-                LingoPDF is intended for general student, research, and adult reading audiences. We do not
-                knowingly collect or solicit personal information from children under 13 years of age (or
-                applicable local age threshold). If we discover that a child has created an account, we will
-                promptly delete that account and associated records upon notice.
+                LingoPDF is not directed to children under 13. We do not knowingly collect personal information from
+                children under 13.
+              </p>
+              <p>
+                If we become aware that an account has been created by a child below the applicable minimum age, we
+                will take appropriate steps in accordance with applicable law.
               </p>
             </section>
 
-            {/* 16. User Privacy Rights and Choices */}
-            <section id="user-rights" className="scroll-mt-24 space-y-4">
+            {/* 15. Your Privacy Rights and Choices */}
+            <section id="privacy-rights" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                16. User Privacy Rights and Choices
+                15. Your Privacy Rights and Choices
               </h2>
-              <p>
-                Depending on your location and applicable privacy laws, you may exercise specific rights
-                regarding your personal information:
-              </p>
+              <p>Depending on your location and applicable law, you may have rights to:</p>
               <ul className="list-disc pl-5 space-y-2">
-                <li>The right to request confirmation of the personal data we hold about you.</li>
-                <li>The right to request correction of inaccurate or outdated profile details.</li>
-                <li>The right to request deletion of your account and associated authentication records.</li>
-                <li>The right to withdraw consent for email communications.</li>
+                <li>Request access to personal information we hold about you.</li>
+                <li>Request correction of inaccurate information.</li>
+                <li>Request deletion of your account and eligible associated information.</li>
+                <li>Raise concerns about how your information is processed.</li>
+                <li>Exercise other rights provided by applicable data-protection law.</li>
               </ul>
               <p>
-                To exercise any of these rights, contact us at{" "}
+                Some information may need to be retained where legally required or necessary to resolve disputes,
+                prevent fraud or meet legitimate operational obligations.
+              </p>
+              <p>
+                To make a privacy request, contact{" "}
                 <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
                   support@lingopdf.in
                 </a>
@@ -495,34 +514,31 @@ export default function PrivacyPolicyPage() {
               </p>
             </section>
 
-            {/* 17. Policy Updates */}
-            <section id="policy-updates" className="scroll-mt-24 space-y-4">
+            {/* 16. Changes to This Policy */}
+            <section id="policy-changes" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                17. Policy Updates
+                16. Changes to This Policy
               </h2>
               <p>
-                We may update this Privacy Policy from time to time as new features (such as commercial
-                licensing or additional language editions) are released. When changes are made, we will
-                update the &ldquo;Last updated&rdquo; date at the top of this document. Material updates
-                will be communicated with notice on our website.
+                We may update this Policy as LingoPDF develops new features, introduces commercial services or changes
+                its data-processing practices.
+              </p>
+              <p>
+                The revised date will be shown at the top of this page. Material changes will be communicated through
+                an appropriate website notice or other suitable channel.
               </p>
             </section>
 
-            {/* 18. Contact Information */}
+            {/* 17. Contact Information */}
             <section id="contact-information" className="scroll-mt-24 space-y-4">
               <h2 className="font-heading text-2xl font-bold text-[var(--color-forest-green)]">
-                18. Contact Information
+                17. Contact Information
               </h2>
-              <p>
-                For any questions, concerns, or privacy requests regarding this Privacy Policy or our
-                local-first reading architecture, please reach out to:
-              </p>
+              <p>For privacy questions, data requests or account-related concerns:</p>
               <div className="rounded-2xl border border-[var(--color-soft-sage)] bg-white p-5 sm:p-6 shadow-2xs max-w-md">
-                <p className="font-semibold text-[var(--color-forest-green)] mb-1">
-                  LingoPDF Support Team
-                </p>
+                <p className="font-semibold text-[var(--color-forest-green)] mb-1">LingoPDF Support</p>
                 <p className="text-sm text-[var(--color-charcoal)]/80 mb-2">
-                  General Inquiries, Privacy Requests &amp; Account Assistance:
+                  Privacy Requests &amp; Account Assistance:
                 </p>
                 <p className="text-sm font-mono text-[var(--color-forest-green)]">
                   <a href="mailto:support@lingopdf.in" className="underline">
@@ -530,11 +546,14 @@ export default function PrivacyPolicyPage() {
                   </a>
                 </p>
                 <p className="text-xs text-[var(--color-charcoal)]/60 mt-3">
-                  Website: <a href="https://lingopdf.in" className="underline">https://lingopdf.in</a>
+                  Website:{" "}
+                  <a href="https://www.lingopdf.in" className="underline">
+                    https://www.lingopdf.in
+                  </a>
                 </p>
                 <p className="text-xs text-[var(--color-charcoal)]/60 mt-1">
-                  Formal registered corporate entity and statutory postal address details will be
-                  formally published upon commercial business registration.
+                  Business registration details and the applicable formal service address will be added when the
+                  relevant business registration is completed.
                 </p>
               </div>
             </section>
@@ -549,7 +568,7 @@ export default function PrivacyPolicyPage() {
               <span>← Return to Home</span>
             </Link>
             <a
-              href="#introduction"
+              href="#overview"
               className="text-xs sm:text-sm font-medium text-[var(--color-charcoal)]/70 hover:text-[var(--color-forest-green)]"
             >
               Back to top ↑

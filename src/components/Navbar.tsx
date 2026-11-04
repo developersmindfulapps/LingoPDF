@@ -99,22 +99,7 @@ export function Navbar() {
                   Sign Out
                 </button>
               </div>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link
-                  href="/login"
-                  className="text-sm font-medium text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-forest-green)] rounded-md px-2 py-1"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  className="text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)] hover:text-[#122B24] border border-[var(--color-soft-sage)] hover:border-[var(--color-forest-green)]/40 rounded-lg px-2.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-forest-green)]"
-                >
-                  Create Account
-                </Link>
-              </div>
-            )}
+            ) : null}
             <ExtensionCtaButton label="Get the Extension" size="md" />
           </div>
 
@@ -180,24 +165,7 @@ export function Navbar() {
                   Sign Out
                 </button>
               </div>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-medium text-[var(--color-charcoal)] hover:text-[var(--color-forest-green)]"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2 text-sm font-semibold text-[var(--color-forest-green)] bg-white border border-[var(--color-soft-sage)] rounded-lg"
-                >
-                  Create Account
-                </Link>
-              </>
-            )}
+            ) : null}
             <ExtensionCtaButton label="Get the Extension" size="md" fullWidth />
           </div>
         </div>

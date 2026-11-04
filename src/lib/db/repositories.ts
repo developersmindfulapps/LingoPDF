@@ -715,7 +715,7 @@ export const referralProfileCreateSchema = z
         /^[A-Z0-9_-]{4,24}$/,
         "Referral code must be 4-24 uppercase alphanumeric characters"
       ),
-    status: z.enum(["active", "suspended", "revoked"]).default("active"),
+    status: z.enum(["active", "exhausted", "suspended", "revoked"]).default("active"),
     maxReferralsCap: z
       .literal(MAX_SUCCESSFUL_REFERRALS_PER_USER)
       .default(MAX_SUCCESSFUL_REFERRALS_PER_USER),

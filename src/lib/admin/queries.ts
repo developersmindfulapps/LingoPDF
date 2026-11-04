@@ -1578,7 +1578,7 @@ export async function listAdminReferrals(
   ]);
 
   const userById = new Map(users.map((u) => [u._id.toString(), u]));
-  const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lingopdf.in";
+  const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.lingopdf.in";
 
   const items = rawProfiles.map((rp) => {
     const u = userById.get(rp.userId.toString());

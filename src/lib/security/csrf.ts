@@ -32,6 +32,16 @@ export interface CsrfValidationOptions {
 }
 
 /**
+ * Explicit authorized production origins.
+ * Vercel serves the canonical site on https://www.lingopdf.in and redirects https://lingopdf.in -> https://www.lingopdf.in.
+ * Both origins are part of the authorized production domain infrastructure.
+ */
+export const TRUSTED_PRODUCTION_ORIGINS = [
+  "https://www.lingopdf.in",
+  "https://lingopdf.in",
+] as const;
+
+/**
  * Safely parses an HTTP(S) URL and extracts its exact normalized origin (`scheme://host[:port]`).
  * Returns null for malformed URLs, opaque `"null"` origins, or non-HTTP(S) schemes.
  */
@@ -60,6 +70,57 @@ export function parseStrictOrigin(rawUrlOrOrigin: string | null | undefined): st
 }
 
 /**
+ * Resolves all authorized application origins.
+ * When `overrideAppUrl` is provided (e.g. in targeted tests), restricts strictly to that origin.
+ */
+export function getAllowedOrigins(overrideAppUrl?: string): string[] {
+  const allowed = new Set<string>();
+
+  if (overrideAppUrl) {
+    const parsedOverride = parseStrictOrigin(overrideAppUrl);
+    if (parsedOverride) {
+      allowed.add(parsedOverride);
+      return Array.from(allowed);
+    }
+  }
+
+  // Include explicit production origins
+  for (const origin of TRUSTED_PRODUCTION_ORIGINS) {
+    allowed.add(origin);
+  }
+
+  // Include configured app URL if set
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL;
+  if (appUrl) {
+    const parsedEnv = parseStrictOrigin(appUrl);
+    if (parsedEnv) {
+      allowed.add(parsedEnv);
+    }
+  }
+
+  // In non-production environments, allow local development origins
+  if (process.env.NODE_ENV !== "production") {
+    allowed.add("http://localhost:3000");
+    allowed.add("http://127.0.0.1:3000");
+  }
+
+  return Array.from(allowed);
+}
+
+/**
+ * Checks whether an origin is authorized under the security allowlist.
+ */
+export function isAllowedOrigin(
+  rawOrigin: string | null | undefined,
+  options: CsrfValidationOptions = {}
+): boolean {
+  const parsed = parseStrictOrigin(rawOrigin);
+  if (!parsed) return false;
+  const allowed = getAllowedOrigins(options.trustedAppUrl);
+  return allowed.includes(parsed);
+}
+
+/**
  * Resolves the canonical application origin from trusted server configuration.
  */
 export function getCanonicalOrigin(overrideAppUrl?: string): string {
@@ -72,16 +133,65 @@ export function getCanonicalOrigin(overrideAppUrl?: string): string {
 }
 
 /**
+ * Resolves safe CORS response headers for authorized origins.
+ * Never uses wildcard "*" with credentials.
+ */
+export function getCorsHeaders(
+  request: Request,
+  options: CsrfValidationOptions = {}
+): Record<string, string> | null {
+  const rawOrigin = request.headers.get("origin");
+  if (!rawOrigin) return null;
+
+  const parsedOrigin = parseStrictOrigin(rawOrigin);
+  if (!parsedOrigin || !isAllowedOrigin(parsedOrigin, options)) {
+    return null;
+  }
+
+  return {
+    "Access-Control-Allow-Origin": parsedOrigin,
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, X-Requested-With, sec-fetch-site",
+    "Access-Control-Max-Age": "86400",
+    Vary: "Origin",
+  };
+}
+
+/**
+ * Handles CORS preflight OPTIONS requests securely.
+ * Rejects untrusted origins with 403 Forbidden.
+ */
+export function handleCorsPreflight(
+  request: Request,
+  options: CsrfValidationOptions = {}
+): NextResponse {
+  const corsHeaders = getCorsHeaders(request, options);
+  if (!corsHeaders) {
+    return NextResponse.json(
+      { error: "Origin not permitted.", code: "CORS_ORIGIN_DENIED" },
+      { status: 403 }
+    );
+  }
+
+  return new NextResponse(null, {
+    status: 204,
+    headers: corsHeaders,
+  });
+}
+
+/**
  * Validates browser state-changing requests against Cross-Site Request Forgery (CSRF).
  *
  * Security rules enforced:
  * 1. Fetch Metadata (`Sec-Fetch-Site`) is checked as a defense-in-depth signal:
  *    - `cross-site` and `same-site` (sibling subdomains) are rejected immediately.
  *    - `same-origin` still requires exact `Origin` / `Referer` origin verification.
- * 2. If `Origin` header is present, it is parsed strictly and compared against the exact
- *    canonical application origin. Malformed or mismatched `Origin` values never fall back to `Referer`.
+ * 2. If `Origin` header is present, it is parsed strictly and validated against the explicit
+ *    trusted origin allowlist. Malformed or mismatched `Origin` values never fall back to `Referer`.
  * 3. If `Origin` is absent, `Referer` is parsed strictly and its origin is compared against
- *    the exact canonical application origin.
+ *    the explicit trusted origin allowlist.
  * 4. If both `Origin` and `Referer` are absent, the request is rejected.
  * 5. For JSON endpoints (`requireJsonContentType !== false`), `Content-Type` must be `application/json`.
  */
@@ -91,9 +201,8 @@ export function validateCsrfRequest(
 ): CsrfValidationResult {
   const { requireJsonContentType = true, trustedAppUrl } = options;
 
-  let canonicalOrigin: string;
   try {
-    canonicalOrigin = getCanonicalOrigin(trustedAppUrl);
+    getCanonicalOrigin(trustedAppUrl);
   } catch {
     return {
       allowed: false,
@@ -138,7 +247,7 @@ export function validateCsrfRequest(
       };
     }
 
-    if (parsedOrigin !== canonicalOrigin) {
+    if (!isAllowedOrigin(parsedOrigin, options)) {
       return {
         allowed: false,
         code: "CSRF_ORIGIN_MISMATCH",
@@ -168,7 +277,7 @@ export function validateCsrfRequest(
       };
     }
 
-    if (parsedRefererOrigin !== canonicalOrigin) {
+    if (!isAllowedOrigin(parsedRefererOrigin, options)) {
       return {
         allowed: false,
         code: "CSRF_REFERER_MISMATCH",
