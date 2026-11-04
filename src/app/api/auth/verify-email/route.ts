@@ -2,14 +2,43 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db/mongodb";
 import { getUsersCollection } from "@/lib/db/models";
 import { hashToken, sanitizeUser } from "@/lib/auth/session";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import { enforceIpRateLimit } from "@/lib/auth/rateLimit";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function GET(request: NextRequest) {
+  const { blockedResponse } = await enforceIpRateLimit({
+    request,
+    policy: "verifyEmail",
+    rateLimitExceededMessage:
+      "Too many verification attempts. Please try again later.",
+  });
+  if (blockedResponse) {
+    return blockedResponse;
+  }
+
   const token = request.nextUrl.searchParams.get("token");
-  return handleVerification(request, token);
+  return handleVerification(token);
 }
 
 export async function POST(request: NextRequest) {
+  // 1. CSRF / Origin validation for state-changing POST verification
+  const csrfBlocked = enforceCsrfProtection(request, "auth.verify_email");
+  if (csrfBlocked) {
+    return csrfBlocked;
+  }
+
+  // 2. Persistent IP rate limiting (max 10 verification requests per 15 minutes per IP)
+  const { blockedResponse } = await enforceIpRateLimit({
+    request,
+    policy: "verifyEmail",
+    rateLimitExceededMessage:
+      "Too many verification attempts. Please try again later.",
+  });
+  if (blockedResponse) {
+    return blockedResponse;
+  }
+
   let token: string | null = null;
   try {
     const body = await request.json();
@@ -23,28 +52,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  return handleVerification(request, token);
+  return handleVerification(token);
 }
 
-async function handleVerification(request: NextRequest, rawToken: string | null) {
+async function handleVerification(rawToken: string | null) {
   try {
-    // 1. Rate limiting (max 10 verification requests per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`verify-email:${ip}`, 10, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many verification attempts. Please try again later.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
-    }
-
-    // 2. Validate token structure
+    // 1. Validate token structure
     const trimmed = rawToken?.trim();
     if (!trimmed || trimmed.length < 32 || trimmed.length > 128) {
       return NextResponse.json(
@@ -57,11 +70,12 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
       );
     }
 
-    // 3. Connect to database
+    // 2. Connect to database
     let db;
     try {
       db = await getDb();
-    } catch {
+    } catch (dbErr) {
+      logger.error("auth_verify_email_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -75,7 +89,7 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
     const tokenHash = hashToken(trimmed);
     const now = new Date();
 
-    // 4. Look up user by verification token hash
+    // 3. Look up user by verification token hash
     const user = await users.findOne({ emailVerificationTokenHash: tokenHash });
 
     if (!user) {
@@ -89,7 +103,7 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
       );
     }
 
-    // 5. Check if already verified
+    // 4. Check if already verified
     if (user.isEmailVerified) {
       return NextResponse.json(
         {
@@ -102,7 +116,7 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
       );
     }
 
-    // 6. Check token expiration (24 hours)
+    // 5. Check token expiration (24 hours)
     if (user.emailVerificationExpires && user.emailVerificationExpires < now) {
       return NextResponse.json(
         {
@@ -116,7 +130,7 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
       );
     }
 
-    // 7. Atomically mark verified and clear token to prevent reuse
+    // 6. Atomically mark verified and clear token to prevent reuse
     const updated = await users.findOneAndUpdate(
       {
         _id: user._id,
@@ -158,7 +172,7 @@ async function handleVerification(request: NextRequest, rawToken: string | null)
       { status: 200 }
     );
   } catch (error) {
-    console.error("[verify-email] Unexpected error:", error);
+    logger.error("auth_verify_email_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }

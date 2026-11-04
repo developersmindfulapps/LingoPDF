@@ -1,6 +1,6 @@
 # LingoPDF
 
-LingoPDF is the website, account platform, licensing backend, and administrative system for a family of paid language-related browser extensions, beginning with the LingoPDF German-to-English PDF Word Translation extension.
+LingoPDF is the website, account platform, licensing backend, and administrative system for a family of paid language-related browser extensions, beginning with the LingoPDF German-to-English Vocabulary-Building PDF Reader extension.
 
 > **Note:** This repository exclusively hosts the LingoPDF web application and backend platform. The browser extensions live in separate repositories.
 
@@ -39,7 +39,15 @@ Copy-Item .env.example .env.local
 
 Configure your local environment variables in `.env.local`. Do not commit `.env.local` to version control.
 
-### 3. Run Development Server
+### 3. Provision Database Indexes
+
+Provision the required MongoDB indexes (`43` indexes across `13` collections in `src/lib/db/models.ts`):
+
+```bash
+npm run db:indexes
+```
+
+### 4. Run Development Server
 
 Start the local Next.js development server:
 
@@ -60,6 +68,10 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 | `npm run start` | Starts the Next.js production server (requires `npm run build`) |
 | `npm run lint` | Runs ESLint to check code quality and syntax |
 | `npm run typecheck` | Runs TypeScript compiler (`tsc --noEmit`) to verify types |
+| `npm run db:indexes` | Provisions all `43` required MongoDB indexes across the `13` application collections |
+| `npm test` | Runs automated unit tests, mocked collection/index tests, admin & audit tests, and real MongoDB integration tests |
+
+See [`docs/OPERATIONS.md`](./docs/OPERATIONS.md) for the Stage 3B.3 Operational, Database & Security Runbook (environment variables, collection relationships, index provisioning, MongoDB Atlas replica-set topology and transaction guarantees, server-side admin authorization, initial admin provisioning, append-only audit logging, rate-limiting fail-closed behavior, and backup/restore procedures).
 
 ---
 
@@ -67,15 +79,17 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to view the 
 
 ```text
 LingoPDF/
+├── docs/                   # Operational and security runbooks
 ├── public/                 # Static assets (favicons, SVGs, public images)
+├── scripts/                # Index provisioning and verification test scripts
 ├── src/
 │   ├── app/                # Next.js App Router root
 │   │   ├── favicon.ico     # Application favicon
 │   │   ├── globals.css     # Global styles & CSS custom property brand tokens
 │   │   ├── layout.tsx      # Root layout with Space Grotesk & Inter font setup
-│   │   └── page.tsx        # Temporary status verification screen
-│   ├── components/         # Reusable React components (ready for future phases)
-│   └── lib/                # Shared utilities, database helpers, and library configs
+│   │   └── page.tsx        # Homepage
+│   ├── components/         # Reusable React components
+│   └── lib/                # Shared utilities, database, security, pricing, and observability
 ├── .env.example            # Template for environment variables
 ├── .gitignore              # Git ignore rules for dependencies, env files, and build outputs
 ├── eslint.config.mjs       # ESLint configuration

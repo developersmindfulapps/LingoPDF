@@ -12,16 +12,16 @@ import { FaqAccordion } from "@/components/FaqAccordion";
 import { siteConfig } from "@/lib/siteConfig";
 
 export const metadata: Metadata = {
-  title: "LingoPDF PDF Reader — German to English Browser Extension",
+  title: "LingoPDF PDF Reader — German-to-English Vocabulary-Building PDF Reader",
   description:
-    "Read German PDFs with effortless inline word lookup. Features local dictionary definitions, OCR for scanned documents, and offline capability after activation.",
+    "Read German PDFs and build vocabulary in context with effortless inline word lookup, local dictionary definitions, and local OCR for scanned documents.",
   alternates: {
     canonical: "/products/german-english",
   },
   openGraph: {
     title: "LingoPDF PDF Reader — German to English",
     description:
-      "Understand German PDFs without losing your flow. Local dictionary lookup, local OCR for scanned pages, and offline operation after activation.",
+      "Understand German PDFs without losing your flow. Local dictionary lookup and local OCR for scanned pages in a focused vocabulary-building PDF reader.",
     type: "website",
   },
 };
@@ -30,7 +30,7 @@ const FAQ_ITEMS = [
   {
     question: "What is LingoPDF PDF Reader?",
     answer:
-      "LingoPDF PDF Reader is a lightweight browser extension built to help you read German PDFs effortlessly. It provides instant, contextual vocabulary and grammar lookups right on the page without requiring you to switch between browser tabs or external translation tools.",
+      "LingoPDF PDF Reader is a German-to-English vocabulary-building PDF reader browser extension. It provides instant, contextual word and grammar lookups right on the page without requiring you to switch between browser tabs or external tools.",
   },
   {
     question: "Does it work with scanned PDFs?",
@@ -40,27 +40,27 @@ const FAQ_ITEMS = [
   {
     question: "Does my PDF get uploaded to a server?",
     answer:
-      "No. LingoPDF is built around local-first document processing. Ordinary dictionary lookups and local OCR operations run directly within your browser session without transmitting your PDF contents to remote translation servers.",
+      "No. LingoPDF is built around local-first document processing. Ordinary dictionary lookups and local OCR operations run directly within your browser session without transmitting your PDF contents to remote servers.",
   },
   {
-    question: "Can I use it offline?",
+    question: "How will activation and offline access work?",
     answer:
-      "Yes. Once purchased and activated, all core dictionary data and processing tools run locally on your machine, enabling full offline reading support without an active internet connection.",
+      "All core dictionary data and OCR processing tools run locally on your machine. Under our commercial licensing policy, online activation and periodic online entitlement verification will be required, with a planned 3-day offline grace period between verifications.",
   },
   {
     question: "Is this a subscription?",
     answer:
-      "No. LingoPDF is offered as a single one-time payment for a lifetime license with no recurring fees, hidden charges, or active subscription renewals.",
+      "No. Each language edition of LingoPDF is offered as a separate one-time purchase that includes all future updates to that language edition, with no recurring fees or subscription renewals.",
   },
   {
-    question: "How does the free tier work?",
+    question: "Is there a free tier or free trial?",
     answer:
-      "You can explore LingoPDF with up to five free word lookups per day. To unlock unlimited lookups, offline access, and full OCR support, simply activate your lifetime license.",
+      "No. LingoPDF is a paid-only product with no free tier and no free trial. Under our commercial licensing policy, downloading the Chrome extension alone will not grant access to protected reader or vocabulary lookup functionality; an active single-device licence purchase will be required. Each purchase permits one active device.",
   },
   {
     question: "What is the refund policy?",
     answer:
-      "We offer a 3-day money-back guarantee from your date of purchase, subject to our standard published refund terms. If LingoPDF does not meet your reading needs, contact support@lingopdf.in for a prompt refund.",
+      "We offer a 3-day (72-hour) money-back guarantee from your exact purchase timestamp, subject to our published refund terms. If LingoPDF does not meet your reading needs, contact support@lingopdf.in for a full refund.",
   },
 ];
 
@@ -88,7 +88,7 @@ export default function GermanEnglishProductPage() {
                 </h1>
 
                 <p className="font-sans text-base sm:text-lg lg:text-xl text-[var(--color-charcoal)]/80 max-w-xl leading-relaxed mb-8">
-                  Look up German words directly inside your PDFs with a local dictionary and OCR for scanned pages. Stay focused on what you&apos;re reading instead of constantly switching between applications.
+                  Look up German words directly inside your PDFs to build vocabulary in context with a local dictionary and OCR for scanned pages. Stay focused on what you&apos;re reading instead of constantly switching between applications.
                 </p>
 
                 {/* Primary & Secondary CTAs */}
@@ -117,13 +117,13 @@ export default function GermanEnglishProductPage() {
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
                       ✓
                     </span>
-                    <span>Offline use after activation</span>
+                    <span>1 device per purchase</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-[var(--color-charcoal)]/80">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
                       ✓
                     </span>
-                    <span>One-time purchase</span>
+                    <span>One-time edition purchase</span>
                   </div>
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function GermanEnglishProductPage() {
                   Keep your documents local
                 </h3>
                 <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-                  Dictionary lookup and OCR are designed to run locally. Ordinary word lookups do not require uploading PDF contents to a translation server.
+                  Dictionary lookup and OCR are designed to run locally. Ordinary word lookups do not require uploading PDF contents to a remote server.
                 </p>
               </div>
             </div>
@@ -341,7 +341,7 @@ export default function GermanEnglishProductPage() {
                     Floating dictionary result
                   </h4>
                   <p className="text-xs sm:text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-                    Instantly view concise contextual English translations, parts of speech, and usage definitions.
+                    Instantly view concise contextual English definitions, parts of speech, and usage details.
                   </p>
                 </div>
               </div>
@@ -433,10 +433,10 @@ export default function GermanEnglishProductPage() {
                   06
                 </div>
                 <h3 className="font-heading text-lg font-bold text-[var(--color-forest-green)] mb-2">
-                  Offline use after paid activation
+                  Planned 3-day offline grace policy
                 </h3>
                 <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-                  Read and inspect documents completely offline without requiring an active internet connection.
+                  Local dictionary and OCR execution with a planned 3-day offline grace period between online entitlement verifications.
                 </p>
               </div>
 
@@ -448,10 +448,10 @@ export default function GermanEnglishProductPage() {
                   </div>
                   <div>
                     <h3 className="font-heading text-lg font-bold text-[var(--color-forest-green)] mb-2">
-                      One-time purchase rather than a subscription
+                      One-time language edition purchase
                     </h3>
                     <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans max-w-3xl">
-                      A fair, transparent license model. Pay once and keep using the reader without recurring monthly fees.
+                      Each language edition is purchased separately as a one-time payment that includes all future updates to that edition and permits one active device per purchase.
                     </p>
                   </div>
                 </div>
@@ -471,7 +471,7 @@ export default function GermanEnglishProductPage() {
                 </h2>
 
                 <p className="font-sans text-base sm:text-lg text-[#E8E4D9]/90 leading-relaxed mb-8 max-w-xl">
-                  LingoPDF is designed around local document processing. Ordinary dictionary lookups and local OCR operations do not require uploading your PDF contents to a remote translation server.
+                  LingoPDF is designed around local document processing. Ordinary dictionary lookups and local OCR operations do not require uploading your PDF contents to a remote server.
                 </p>
 
                 <div className="space-y-4 w-full mb-8">
@@ -489,7 +489,7 @@ export default function GermanEnglishProductPage() {
                       ✓
                     </span>
                     <span className="text-sm sm:text-base font-medium text-white">
-                      Zero remote document storage
+                      Zero remote PDF document storage
                     </span>
                   </div>
 
@@ -498,7 +498,7 @@ export default function GermanEnglishProductPage() {
                       ✓
                     </span>
                     <span className="text-sm sm:text-base font-medium text-white">
-                      Operates offline after license activation
+                      Planned 3-day offline grace period between online verifications
                     </span>
                   </div>
                 </div>
@@ -541,7 +541,7 @@ export default function GermanEnglishProductPage() {
                   originalPrice={germanPricing.originalPrice}
                   isPromoActive={germanPricing.isPromoActive}
                   currency={germanPricing.currency}
-                  periodDescription="One-time payment • No subscription"
+                  periodDescription="One-time edition payment • No subscription"
                   align="center"
                 />
               </div>
@@ -549,30 +549,30 @@ export default function GermanEnglishProductPage() {
               <div className="space-y-3 text-left my-8 py-6 border-y border-[var(--color-soft-sage)]/70 text-xs sm:text-sm text-[var(--color-charcoal)]/80">
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>One-time payment for lifetime license</span>
+                  <span>One-time purchase for the German → English edition</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>No subscription or recurring charges</span>
+                  <span>Includes future updates to this language edition</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Up to 2 active installations per license</span>
+                  <span>1 active device permitted per purchase</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Three-day money-back guarantee</span>
+                  <span>Paid-only product — no free tier and no free trial</span>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Five free word lookups per day before upgrading</span>
+                  <span>Planned online activation with a 3-day offline grace period</span>
                 </div>
               </div>
 
               <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-4" />
 
               <p className="text-xs text-[var(--color-charcoal)]/60 leading-relaxed font-sans">
-                Full unlimited access requires purchase and activation. 3-day money-back guarantee.
+                Paid-only product. Each language edition is purchased separately. 3-day (72-hour) money-back guarantee.
               </p>
             </div>
           </div>

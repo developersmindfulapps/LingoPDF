@@ -7,28 +7,37 @@ import {
   hashToken,
   VERIFICATION_EXPIRATION_HOURS,
 } from "@/lib/auth/session";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import {
+  enforceIpRateLimit,
+  enforceEmailRateLimit,
+} from "@/lib/auth/rateLimit";
 import { sendVerificationEmail } from "@/lib/email/resend";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limiting (max 3 resend attempts per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`resend-verif:${ip}`, 3, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many resend attempts. Please wait before trying again.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
+    // 1. CSRF / Origin validation
+    const csrfBlocked = enforceCsrfProtection(
+      request,
+      "auth.resend_verification"
+    );
+    if (csrfBlocked) {
+      return csrfBlocked;
     }
 
-    // 2. Validate input
+    // 2. Persistent IP rate limiting (max 3 resend attempts per 15 minutes per IP)
+    const { blockedResponse: ipBlocked } = await enforceIpRateLimit({
+      request,
+      policy: "resendVerification",
+      rateLimitExceededMessage:
+        "Too many resend attempts. Please wait before trying again.",
+    });
+    if (ipBlocked) {
+      return ipBlocked;
+    }
+
+    // 3. Validate input
     let body: unknown;
     try {
       body = await request.json();
@@ -49,11 +58,24 @@ export async function POST(request: NextRequest) {
 
     const { email } = parsed.data;
 
-    // 3. Connect to database
+    // 4. Persistent Email/Account rate limiting (max 3 resend attempts per 15 minutes per email)
+    // Checked before user lookup so enumeration is impossible
+    const emailBlocked = await enforceEmailRateLimit({
+      policy: "resendVerification",
+      email,
+      rateLimitExceededMessage:
+        "Too many resend attempts. Please wait before trying again.",
+    });
+    if (emailBlocked) {
+      return emailBlocked;
+    }
+
+    // 5. Connect to database
     let db;
     try {
       db = await getDb();
-    } catch {
+    } catch (dbErr) {
+      logger.error("auth_resend_verification_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -65,7 +87,7 @@ export async function POST(request: NextRequest) {
 
     const users = await getUsersCollection(db);
 
-    // 4. Find user by normalized email
+    // 6. Find user by normalized email
     const user = await users.findOne({ email });
 
     // Always return a generic success message to prevent user enumeration
@@ -79,7 +101,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(genericResponse, { status: 200 });
     }
 
-    // 5. Generate fresh single-use verification token
+    // 7. Generate fresh single-use verification token
     const now = new Date();
     const rawToken = generateOpaqueToken();
     const tokenHash = hashToken(rawToken);
@@ -98,7 +120,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // 6. Send email
+    // 8. Send email
     await sendVerificationEmail({
       to: user.email,
       name: user.name,
@@ -107,7 +129,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(genericResponse, { status: 200 });
   } catch (error) {
-    console.error("[resend-verification] Unexpected error:", error);
+    logger.error("auth_resend_verification_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }

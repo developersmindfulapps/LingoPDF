@@ -5,6 +5,7 @@ import {
   sanitizeUser,
   SESSION_COOKIE_NAME,
 } from "@/lib/auth/session";
+import { logger } from "@/lib/observability/logger";
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest) {
     try {
       db = await getDb();
     } catch (dbErr) {
-      console.error("[session] Database connection error:", dbErr);
+      logger.error("auth_session_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable",
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
     ) {
       throw error;
     }
-    console.error("[session] Unexpected error:", error);
+    logger.error("auth_session_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR", user: null },
       { status: 500 }

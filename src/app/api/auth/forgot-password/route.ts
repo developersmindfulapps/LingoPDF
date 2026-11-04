@@ -7,28 +7,34 @@ import {
   hashToken,
   PASSWORD_RESET_EXPIRATION_HOURS,
 } from "@/lib/auth/session";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import {
+  enforceIpRateLimit,
+  enforceEmailRateLimit,
+} from "@/lib/auth/rateLimit";
 import { sendPasswordResetEmail } from "@/lib/email/resend";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limiting (max 5 requests per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`forgot-pw:${ip}`, 5, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many password reset requests. Please try again later.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
+    // 1. CSRF / Origin validation
+    const csrfBlocked = enforceCsrfProtection(request, "auth.forgot_password");
+    if (csrfBlocked) {
+      return csrfBlocked;
     }
 
-    // 2. Validate input
+    // 2. Persistent IP rate limiting (max 5 requests per 15 minutes per IP)
+    const { blockedResponse: ipBlocked } = await enforceIpRateLimit({
+      request,
+      policy: "forgotPassword",
+      rateLimitExceededMessage:
+        "Too many password reset requests. Please try again later.",
+    });
+    if (ipBlocked) {
+      return ipBlocked;
+    }
+
+    // 3. Validate input
     let body: unknown;
     try {
       body = await request.json();
@@ -49,11 +55,24 @@ export async function POST(request: NextRequest) {
 
     const { email } = parsed.data;
 
-    // 3. Connect to database
+    // 4. Persistent Email/Account rate limiting (max 3 requests per 15 minutes per email)
+    // Checked before user lookup so enumeration is impossible
+    const emailBlocked = await enforceEmailRateLimit({
+      policy: "forgotPassword",
+      email,
+      rateLimitExceededMessage:
+        "Too many password reset requests. Please try again later.",
+    });
+    if (emailBlocked) {
+      return emailBlocked;
+    }
+
+    // 5. Connect to database
     let db;
     try {
       db = await getDb();
-    } catch {
+    } catch (dbErr) {
+      logger.error("auth_forgot_password_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -65,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     const users = await getUsersCollection(db);
 
-    // 4. Look up user by normalized lowercase email
+    // 6. Look up user by normalized lowercase email
     const user = await users.findOne({ email });
 
     // Always return generic response to prevent account enumeration
@@ -80,7 +99,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(genericResponse, { status: 200 });
     }
 
-    // 5. Generate single-use reset token and store only its SHA-256 hash
+    // 7. Generate single-use reset token and store only its SHA-256 hash
     const now = new Date();
     const rawResetToken = generateOpaqueToken();
     const resetTokenHash = hashToken(rawResetToken);
@@ -99,7 +118,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    // 6. Send password reset email
+    // 8. Send password reset email
     await sendPasswordResetEmail({
       to: user.email,
       name: user.name,
@@ -108,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(genericResponse, { status: 200 });
   } catch (error) {
-    console.error("[forgot-password] Unexpected error:", error);
+    logger.error("auth_forgot_password_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }

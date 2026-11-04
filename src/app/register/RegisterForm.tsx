@@ -1,19 +1,114 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialReferralCode = (
+    searchParams.get("ref") ||
+    searchParams.get("code") ||
+    ""
+  ).trim().toUpperCase();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [referralCode, setReferralCode] = useState(initialReferralCode);
+  const [referralValidationState, setReferralValidationState] = useState<{
+    valid: boolean | null;
+    message: string | null;
+    checking: boolean;
+  }>({ valid: null, message: null, checking: false });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [registeredSuccess, setRegisteredSuccess] = useState(false);
+
+  const validateCode = useCallback(async (codeToTest: string) => {
+    const trimmed = codeToTest.trim().toUpperCase();
+    if (!trimmed) {
+      setReferralValidationState({ valid: null, message: null, checking: false });
+      return;
+    }
+
+    setReferralValidationState((prev) => ({ ...prev, checking: true }));
+
+    try {
+      const res = await fetch(
+        `/api/referrals/validate?code=${encodeURIComponent(trimmed)}`
+      );
+      const data = await res.json();
+      if (data.valid) {
+        setReferralValidationState({
+          valid: true,
+          message: data.message || "10% Referral Discount will be applied at checkout!",
+          checking: false,
+        });
+      } else {
+        setReferralValidationState({
+          valid: false,
+          message: data.message || "Invalid or expired referral code.",
+          checking: false,
+        });
+      }
+    } catch {
+      setReferralValidationState({
+        valid: null,
+        message: null,
+        checking: false,
+      });
+    }
+  }, []);
+
+  // Prefill and validate initial referral code asynchronously
+  useEffect(() => {
+    let isCancelled = false;
+    if (!initialReferralCode) {
+      return;
+    }
+
+    async function checkInitialCode() {
+      try {
+        const res = await fetch(
+          `/api/referrals/validate?code=${encodeURIComponent(initialReferralCode)}`
+        );
+        const data = await res.json();
+        if (!isCancelled) {
+          if (data.valid) {
+            setReferralValidationState({
+              valid: true,
+              message: data.message || "10% Referral Discount will be applied at checkout!",
+              checking: false,
+            });
+          } else {
+            setReferralValidationState({
+              valid: false,
+              message: data.message || "Invalid or expired referral code.",
+              checking: false,
+            });
+          }
+        }
+      } catch {
+        if (!isCancelled) {
+          setReferralValidationState({
+            valid: null,
+            message: null,
+            checking: false,
+          });
+        }
+      }
+    }
+
+    void checkInitialCode();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [initialReferralCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,6 +134,7 @@ export function RegisterForm() {
           email: trimmedEmail,
           password,
           name: name.trim() || undefined,
+          referralCode: referralCode.trim() ? referralCode.trim().toUpperCase() : undefined,
         }),
       });
 
@@ -210,6 +306,71 @@ export function RegisterForm() {
             )}
           </button>
         </div>
+      </div>
+
+      {/* Referral Code Field (Optional) */}
+      <div>
+        <div className="flex items-center justify-between mb-1.5">
+          <label
+            htmlFor="register-referral"
+            className="block text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]"
+          >
+            Referral code (optional)
+          </label>
+          <span className="text-[11px] text-[var(--color-charcoal)]/60">
+            Save 10% on your purchase
+          </span>
+        </div>
+        <div className="relative">
+          <input
+            id="register-referral"
+            type="text"
+            autoComplete="off"
+            value={referralCode}
+            onChange={(e) => {
+              const upper = e.target.value.toUpperCase();
+              setReferralCode(upper);
+              if (upper.trim().length >= 4) {
+                validateCode(upper);
+              } else {
+                setReferralValidationState({
+                  valid: null,
+                  message: null,
+                  checking: false,
+                });
+              }
+            }}
+            disabled={isLoading}
+            placeholder="e.g. RAJAT4821"
+            className={`w-full rounded-xl border bg-[var(--color-warm-ivory)]/40 px-4 py-2.5 text-sm font-mono uppercase text-[var(--color-charcoal)] placeholder-[var(--color-charcoal)]/40 focus:bg-white focus:outline-none focus:ring-2 transition-all disabled:opacity-60 ${
+              referralValidationState.valid === true
+                ? "border-emerald-500 focus:border-emerald-600 focus:ring-emerald-500/20"
+                : referralValidationState.valid === false
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-400/20"
+                  : "border-[var(--color-soft-sage)] focus:border-[var(--color-forest-green)] focus:ring-[var(--color-forest-green)]/20"
+            }`}
+          />
+          {referralValidationState.checking && (
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3.5">
+              <svg className="h-4 w-4 animate-spin text-[var(--color-charcoal)]/40" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            </div>
+          )}
+        </div>
+        {referralValidationState.message && (
+          <p
+            className={`mt-1.5 text-xs font-medium flex items-center gap-1 ${
+              referralValidationState.valid
+                ? "text-emerald-700"
+                : "text-red-600"
+            }`}
+          >
+            {referralValidationState.valid ? "✓ " : "✕ "}
+            {referralValidationState.message}
+          </p>
+        )}
       </div>
 
       {/* Terms acknowledgement */}

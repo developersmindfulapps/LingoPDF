@@ -3,6 +3,8 @@ import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/db/mongodb";
 import { getUsersCollection } from "@/lib/db/models";
 import { registerSchema } from "@/lib/auth/validation";
+import { findActiveReferralProfileByCode } from "@/lib/referrals/service";
+import { detectClientRoleEscalationAttempt } from "@/lib/auth/admin";
 import {
   hashPassword,
   createSession,
@@ -12,25 +14,28 @@ import {
   VERIFICATION_EXPIRATION_HOURS,
 } from "@/lib/auth/session";
 import { setSessionCookie } from "@/lib/auth/cookies";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import { enforceIpRateLimit } from "@/lib/auth/rateLimit";
 import { sendVerificationEmail } from "@/lib/email/resend";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limiting (max 5 registration attempts per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`register:${ip}`, 5, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many registration attempts. Please try again later.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
+    // 1. CSRF / Origin validation
+    const csrfBlocked = enforceCsrfProtection(request, "auth.register");
+    if (csrfBlocked) {
+      return csrfBlocked;
+    }
+
+    // 2. Persistent IP rate limiting (max 5 registration attempts per 15 minutes per IP)
+    const { blockedResponse, clientIp } = await enforceIpRateLimit({
+      request,
+      policy: "register",
+      rateLimitExceededMessage:
+        "Too many registration attempts. Please try again later.",
+    });
+    if (blockedResponse) {
+      return blockedResponse;
     }
 
     // 2. Body parsing and validation
@@ -41,6 +46,20 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Invalid JSON payload", code: "INVALID_JSON" },
         { status: 400 }
+      );
+    }
+
+    const forbiddenRoleField = detectClientRoleEscalationAttempt(body);
+    if (forbiddenRoleField) {
+      logger.security("auth_register_role_escalation_rejected", {
+        forbiddenField: forbiddenRoleField,
+      });
+      return NextResponse.json(
+        {
+          error: "Client-supplied privilege or role assignment is forbidden.",
+          code: "ROLE_ESCALATION_FORBIDDEN",
+        },
+        { status: 403 }
       );
     }
 
@@ -56,14 +75,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, password, name } = parsed.data;
+    const { email, password, name, referralCode } = parsed.data;
 
     // 3. Connect to MongoDB
     let db;
     try {
       db = await getDb();
     } catch (dbErr) {
-      console.error("[register] Database connection error:", dbErr);
+      logger.error("auth_register_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -74,6 +93,23 @@ export async function POST(request: NextRequest) {
     }
 
     const users = await getUsersCollection(db);
+
+    // 4. Validate referral code if provided (without consuming slot or creating commission)
+    let referredByCode: string | null = null;
+    let referredByUserId: ObjectId | null = null;
+    let referralAttributedAt: Date | null = null;
+
+    if (referralCode && referralCode.trim()) {
+      const activeReferrerProfile = await findActiveReferralProfileByCode(
+        db,
+        referralCode
+      );
+      if (activeReferrerProfile) {
+        referredByCode = activeReferrerProfile.referralCode;
+        referredByUserId = activeReferrerProfile.userId;
+        referralAttributedAt = new Date();
+      }
+    }
 
     // 4. Check for duplicate email (case-insensitive normalized)
     const existing = await users.findOne({ email });
@@ -103,10 +139,14 @@ export async function POST(request: NextRequest) {
       email,
       passwordHash,
       name: name || undefined,
+      role: "customer" as const,
       status: "active" as const,
       isEmailVerified: false,
       emailVerificationTokenHash: verificationTokenHash,
       emailVerificationExpires: verificationExpires,
+      referredByCode,
+      referredByUserId,
+      referralAttributedAt,
       createdAt: now,
       updatedAt: now,
     };
@@ -169,7 +209,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get("user-agent") || undefined;
     const { token, expiresAt } = await createSession(db, newUser._id, {
       userAgent,
-      ipAddress: ip,
+      ipAddress: clientIp || undefined,
     });
 
     // 9. Prepare safe response
@@ -188,7 +228,7 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    console.error("[register] Unexpected error:", error);
+    logger.error("auth_register_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }

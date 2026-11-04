@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "db:indexes": "node scripts/ensure-indexes.js",
+    "admin:provision": "node scripts/provision-initial-admin.js",
     "test": "node scripts/run-milestone-tests.js"
   },
   "dependencies": {

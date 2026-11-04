@@ -43,15 +43,14 @@ export const siteConfig = {
   name: "LingoPDF",
   tagline: "Your PDFs. Their language. Finally, understood.",
   description:
-    "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs, without leaving your document to access translation services.",
+    "Read German PDFs and build vocabulary in context with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs.",
   regionalPricing: REGIONAL_PRICING,
   pricing: {
     german: {
-      price: 49,
-      originalPrice: 89,
-      isPromoActive: true,
-      currency: "$",
-      periodDescription: "One-time payment • Lifetime license",
+      price: REGIONAL_PRICING.DEFAULT.price,
+      isPromoActive: REGIONAL_PRICING.DEFAULT.isPromoActive,
+      currency: REGIONAL_PRICING.DEFAULT.currencySymbol,
+      periodDescription: REGIONAL_PRICING.DEFAULT.periodDescription,
     } as PricingConfig,
   },
   products: [
@@ -61,11 +60,11 @@ export const siteConfig = {
       languagePair: "German → English",
       status: "available",
       badge: "Online",
-      description: "Available now for immediate download and installation with full vocabulary coverage.",
+      description: "German-to-English vocabulary-building PDF reader edition with full local dictionary coverage.",
       href: "/products/german-english",
       features: [
         "Native Chrome & Web PDFs",
-        "Offline / OCR Support",
+        "Local OCR Support",
         "400k+ Word Pairs",
       ],
     },

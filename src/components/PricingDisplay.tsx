@@ -35,18 +35,32 @@ export function PricingDisplay({
   const [pricing, setPricing] = useState<RegionalPricingConfig>(
     REGIONAL_PRICING[initialRegion] || REGIONAL_PRICING[DEFAULT_REGION_CODE]
   );
+  const [availableRegions, setAvailableRegions] = useState<
+    RegionalPricingConfig[]
+  >([REGIONAL_PRICING.US, REGIONAL_PRICING.EU, REGIONAL_PRICING.DEFAULT]);
+  const [canSelectCurrency, setCanSelectCurrency] = useState<boolean>(
+    initialRegion !== "IN"
+  );
   const [hasDetected, setHasDetected] = useState(false);
 
-  // Automatically detect visitor region server-side via edge headers on initial load
+  // Automatically detect visitor region server-side via authoritative edge headers on initial load
   useEffect(() => {
     let isMounted = true;
     async function detectVisitorPricing() {
       try {
-        const res = await fetch("/api/pricing");
+        const res = await fetch("/api/pricing", { cache: "no-store" });
         if (res.ok) {
           const data = await res.json();
           if (isMounted && data.pricing) {
             setPricing(data.pricing);
+            if (Array.isArray(data.availableRegions)) {
+              setAvailableRegions(data.availableRegions);
+            }
+            if (typeof data.canSelectCurrency === "boolean") {
+              setCanSelectCurrency(data.canSelectCurrency);
+            } else {
+              setCanSelectCurrency(data.pricing.regionCode !== "IN");
+            }
             setHasDetected(true);
           }
         }
@@ -82,18 +96,19 @@ export function PricingDisplay({
     : null;
 
   const showCrossedOut =
-    activePromo && activeOriginalPrice && activeOriginalPrice > activePrice;
+    Boolean(activePromo && activeOriginalPrice && activeOriginalPrice > activePrice);
 
   const alignStyles =
     align === "center" ? "items-center text-center" : "items-start text-left";
 
   return (
     <div className={`flex flex-col ${alignStyles} ${className}`}>
-      {/* Optional Country / Currency Selector */}
-      {showSelector && (
+      {/* International Currency Selector (hidden for India where INR is mandatory) */}
+      {showSelector && canSelectCurrency && pricing.regionCode !== "IN" && (
         <div className="mb-3">
           <CurrencySelector
             currentRegion={pricing.regionCode}
+            availableRegions={availableRegions}
             onRegionChange={(newConfig) => setPricing(newConfig)}
             size="sm"
           />

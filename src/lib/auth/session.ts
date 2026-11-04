@@ -156,6 +156,7 @@ export function sanitizeUser(user: UserDocument) {
     id: user._id.toString(),
     email: user.email,
     name: user.name || null,
+    role: user.role === "admin" ? ("admin" as const) : ("customer" as const),
     isEmailVerified: user.isEmailVerified,
     status: user.status,
     createdAt: user.createdAt.toISOString(),

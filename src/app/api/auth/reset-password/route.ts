@@ -7,27 +7,30 @@ import {
   hashToken,
   revokeAllUserSessions,
 } from "@/lib/auth/session";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import { enforceIpRateLimit } from "@/lib/auth/rateLimit";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limiting (max 10 requests per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`reset-pw:${ip}`, 10, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many reset attempts. Please try again later.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
+    // 1. CSRF / Origin validation
+    const csrfBlocked = enforceCsrfProtection(request, "auth.reset_password");
+    if (csrfBlocked) {
+      return csrfBlocked;
     }
 
-    // 2. Validate input
+    // 2. Persistent IP rate limiting (max 10 requests per 15 minutes per IP)
+    const { blockedResponse } = await enforceIpRateLimit({
+      request,
+      policy: "resetPassword",
+      rateLimitExceededMessage:
+        "Too many reset attempts. Please try again later.",
+    });
+    if (blockedResponse) {
+      return blockedResponse;
+    }
+
+    // 3. Validate input
     let body: unknown;
     try {
       body = await request.json();
@@ -52,11 +55,12 @@ export async function POST(request: NextRequest) {
 
     const { token, password } = parsed.data;
 
-    // 3. Connect to database
+    // 4. Connect to database
     let db;
     try {
       db = await getDb();
-    } catch {
+    } catch (dbErr) {
+      logger.error("auth_reset_password_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -70,7 +74,7 @@ export async function POST(request: NextRequest) {
     const tokenHash = hashToken(token);
     const now = new Date();
 
-    // 4. Look up user by password reset token hash
+    // 5. Look up user by password reset token hash
     const user = await users.findOne({ passwordResetTokenHash: tokenHash });
 
     if (!user) {
@@ -94,7 +98,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Verify token has not expired (1 hour)
+    // 6. Verify token has not expired (1 hour)
     if (user.passwordResetExpires && user.passwordResetExpires < now) {
       return NextResponse.json(
         {
@@ -106,10 +110,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Hash new password with Argon2id
+    // 7. Hash new password with Argon2id
     const newPasswordHash = await hashPassword(password);
 
-    // 7. Atomically consume token and update password to prevent reuse
+    // 8. Atomically consume token and update password to prevent reuse
     const updated = await users.findOneAndUpdate(
       {
         _id: user._id,
@@ -141,7 +145,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 8. Revoke all active sessions for this account across all devices
+    // 9. Revoke all active sessions for this account across all devices
     await revokeAllUserSessions(db, user._id);
 
     return NextResponse.json(
@@ -153,7 +157,7 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error("[reset-password] Unexpected error:", error);
+    logger.error("auth_reset_password_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }

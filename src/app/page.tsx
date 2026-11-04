@@ -45,7 +45,7 @@ export default function Home() {
 
                 {/* Description */}
                 <p className="font-sans text-base sm:text-lg lg:text-xl text-[var(--color-charcoal)]/80 max-w-xl leading-relaxed mb-8">
-                  Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs, without leaving your document to access translation services.
+                  A German-to-English vocabulary-building PDF reader with effortless inline word lookup. Built for native Chrome and web PDFs so you can inspect unfamiliar words in context without leaving your document.
                 </p>
 
                 {/* Action Buttons */}
@@ -62,7 +62,7 @@ export default function Home() {
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
                       ✓
                     </span>
-                    <span>No cloud account for PDFs</span>
+                    <span>No cloud upload for PDFs</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-[var(--color-charcoal)]/80">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
@@ -80,13 +80,13 @@ export default function Home() {
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
                       ✓
                     </span>
-                    <span>Works offline after activation</span>
+                    <span>1 device per purchase</span>
                   </div>
                   <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-[var(--color-charcoal)]/80">
                     <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-forest-green)]/10 text-[var(--color-forest-green)]">
                       ✓
                     </span>
-                    <span>One-time purchase</span>
+                    <span>One-time edition purchase</span>
                   </div>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export default function Home() {
                   Read in context
                 </h3>
                 <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-                  Look up German words and phrases on the page without context-switching to browser tabs, external dictionaries, or third-party web apps.
+                  Look up German words and inflections directly on the page to build vocabulary without context-switching to external dictionaries or web tabs.
                 </p>
               </div>
 
@@ -172,10 +172,10 @@ export default function Home() {
                   </svg>
                 </div>
                 <h3 className="font-heading text-xl font-bold text-[var(--color-forest-green)] mb-3">
-                  Buy once
+                  Buy once per edition
                 </h3>
                 <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans">
-                  A fair license with a one-time purchase. No monthly recurring fees, hidden tokens, or locked-in subscriptions.
+                  Each language edition is a separate one-time purchase that includes all future updates to that edition, with no recurring subscription fees.
                 </p>
               </div>
             </div>
@@ -193,7 +193,7 @@ export default function Home() {
                     <div className="overflow-hidden rounded-xl bg-white shadow-md border border-[var(--color-soft-sage)]">
                       <Image
                         src="/images/pdf-reader-ui.png"
-                        alt="Authentic LingoPDF reader showing on-demand vocabulary translation for German PDF texts"
+                        alt="Authentic LingoPDF reader showing on-demand vocabulary lookup for German PDF texts"
                         width={565}
                         height={508}
                         className="w-full h-auto object-cover object-top scale-[1.03] transition-transform duration-500 hover:scale-[1.05]"
@@ -205,7 +205,7 @@ export default function Home() {
                 {/* Right: Product Details, Tags, Pricing & CTA */}
                 <div className="lg:col-span-6 flex flex-col items-start">
                   <Badge variant="forest" className="mb-3">
-                    Available Now
+                    German → English Edition
                   </Badge>
 
                   <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[var(--color-forest-green)] tracking-tight mb-1">
@@ -213,7 +213,7 @@ export default function Home() {
                   </h2>
 
                   <span className="text-sm font-semibold text-[var(--color-terracotta)] mb-4">
-                    German → English Edition
+                    German → English Vocabulary-Building Edition
                   </span>
 
                   <p className="font-sans text-sm sm:text-base text-[var(--color-charcoal)]/80 leading-relaxed mb-6">
@@ -226,7 +226,7 @@ export default function Home() {
                       ✓ Native Chrome &amp; Web PDFs
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-warm-ivory)] border border-[var(--color-soft-sage)] text-xs font-medium text-[var(--color-forest-green)]">
-                      ✓ Offline / OCR Support
+                      ✓ Local OCR Support
                     </span>
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[var(--color-warm-ivory)] border border-[var(--color-soft-sage)] text-xs font-medium text-[var(--color-forest-green)]">
                       ✓ 400k+ Word Pairs
@@ -256,7 +256,7 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-16">
               <h2 className="font-heading text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-[var(--color-forest-green)]">
-                One reading experience. More languages ahead.
+                One reading experience. Separate language editions ahead.
               </h2>
             </div>
 
@@ -313,7 +313,7 @@ export default function Home() {
                   Understand the meaning
                 </h3>
                 <p className="text-sm text-[var(--color-charcoal)]/80 leading-relaxed font-sans max-w-xs">
-                  See full translations and verb forms without losing your place or interrupting your train of thought.
+                  See contextual definitions and verb forms without losing your place or interrupting your train of thought.
                 </p>
               </div>
             </div>
@@ -340,7 +340,7 @@ export default function Home() {
                       ✓
                     </span>
                     <span className="text-sm sm:text-base font-medium text-white">
-                      Local-first execution
+                      Local-first dictionary and OCR execution
                     </span>
                   </div>
 
@@ -349,7 +349,7 @@ export default function Home() {
                       ✓
                     </span>
                     <span className="text-sm sm:text-base font-medium text-white">
-                      Zero external storage
+                      Zero external PDF document storage
                     </span>
                   </div>
 
@@ -358,7 +358,7 @@ export default function Home() {
                       ✓
                     </span>
                     <span className="text-sm sm:text-base font-medium text-white">
-                      Works fully offline
+                      Planned 3-day offline verification grace policy
                     </span>
                   </div>
                 </div>
@@ -389,7 +389,7 @@ export default function Home() {
 
             <div className="max-w-md mx-auto rounded-3xl border border-[var(--color-soft-sage)] bg-white p-8 sm:p-10 shadow-lg text-center">
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]/80 mb-3 block">
-                German–English Extension
+                German–English Edition
               </span>
 
               <div className="my-6">
@@ -410,22 +410,22 @@ export default function Home() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Up to 2 active devices</span>
+                  <span>1 device per purchase</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>Lifetime updates</span>
+                  <span>Edition updates included</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[var(--color-terracotta)] font-bold">✓</span>
-                  <span>5 free lookups / day</span>
+                  <span>Planned 3-day offline grace policy</span>
                 </div>
               </div>
 
               <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-3" />
 
               <span className="text-xs text-[var(--color-charcoal)]/60 block">
-                3-day money-back guarantee
+                Paid-only product • No free tier or free trial • 3-day money-back guarantee
               </span>
             </div>
           </div>

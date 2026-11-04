@@ -35,6 +35,7 @@ export function LingoPDFLogo({
           width={40}
           height={40}
           priority={priority}
+          loading={priority ? "eager" : undefined}
           className="h-9 w-auto object-contain"
         />
       </div>
@@ -52,6 +53,7 @@ export function LingoPDFLogo({
             width={256}
             height={64}
             priority={priority}
+            loading={priority ? "eager" : undefined}
             className="h-8 sm:h-9 md:h-10 w-auto object-contain"
           />
         </div>
@@ -59,7 +61,7 @@ export function LingoPDFLogo({
     );
   }
 
-  // Default: Full horizontal logo lockup
+  // Default: Full horizontal lockup
   return (
     <div className={`relative inline-flex items-center shrink-0 ${className}`} {...ariaAttributes}>
       <Image
@@ -68,6 +70,7 @@ export function LingoPDFLogo({
         width={256}
         height={64}
         priority={priority}
+        loading={priority ? "eager" : undefined}
         className="h-8 sm:h-9 md:h-10 w-auto object-contain"
       />
     </div>

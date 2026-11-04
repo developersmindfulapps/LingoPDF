@@ -16,6 +16,15 @@ export const registerSchema = z.object({
     .trim()
     .max(100, { message: "Name cannot exceed 100 characters" })
     .optional(),
+  referralCode: z
+    .string()
+    .trim()
+    .toUpperCase()
+    .regex(/^[A-Z0-9_-]{4,24}$/, {
+      message: "Referral code must be 4–24 uppercase alphanumeric characters",
+    })
+    .optional()
+    .nullable(),
 });
 
 export const loginSchema = z.object({

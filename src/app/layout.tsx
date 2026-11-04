@@ -18,16 +18,16 @@ const appBaseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://lingopdf.in";
 
 export const metadata: Metadata = {
   metadataBase: new URL(appBaseUrl),
-  title: "LingoPDF — German-to-English PDF Word Translation Extension",
+  title: "LingoPDF — German-to-English Vocabulary-Building PDF Reader",
   description:
-    "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
+    "Read German PDFs and build vocabulary in context with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "LingoPDF — German-to-English PDF Word Translation Extension",
+    title: "LingoPDF — German-to-English Vocabulary-Building PDF Reader",
     description:
-      "Read German PDFs with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
+      "Read German PDFs and build vocabulary in context with effortless inline word lookup. A lightweight browser extension for native Chrome and web PDFs with local-first dictionary processing.",
     url: "https://lingopdf.in",
     siteName: "LingoPDF",
     type: "website",
@@ -51,7 +51,8 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} h-full antialiased scroll-smooth`}
+      data-scroll-behavior="smooth"
+      className={`${spaceGrotesk.variable} ${inter.variable} h-full antialiased scroll-smooth motion-reduce:scroll-auto`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[var(--color-warm-ivory)] text-[var(--color-charcoal)]">
         {children}

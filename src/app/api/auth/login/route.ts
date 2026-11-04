@@ -8,27 +8,33 @@ import {
   sanitizeUser,
 } from "@/lib/auth/session";
 import { setSessionCookie } from "@/lib/auth/cookies";
-import { checkRateLimit, getClientIp } from "@/lib/auth/rateLimit";
+import {
+  enforceIpRateLimit,
+  enforceEmailRateLimit,
+} from "@/lib/auth/rateLimit";
+import { enforceCsrfProtection } from "@/lib/security/csrf";
+import { logger } from "@/lib/observability/logger";
 
 export async function POST(request: NextRequest) {
   try {
-    // 1. Rate limiting (max 10 login attempts per 15 minutes per IP)
-    const ip = getClientIp(request);
-    const rateCheck = checkRateLimit(`login:${ip}`, 10, 15 * 60);
-    if (!rateCheck.allowed) {
-      return NextResponse.json(
-        {
-          error: "Too many login attempts. Please try again later.",
-          code: "RATE_LIMITED",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": rateCheck.retryAfterSeconds.toString() },
-        }
-      );
+    // 1. CSRF / Origin validation
+    const csrfBlocked = enforceCsrfProtection(request, "auth.login");
+    if (csrfBlocked) {
+      return csrfBlocked;
     }
 
-    // 2. Body parsing and validation
+    // 2. Persistent IP rate limiting (max 10 login attempts per 15 minutes per IP)
+    const { blockedResponse: ipBlocked, clientIp } = await enforceIpRateLimit({
+      request,
+      policy: "login",
+      rateLimitExceededMessage:
+        "Too many login attempts. Please try again later.",
+    });
+    if (ipBlocked) {
+      return ipBlocked;
+    }
+
+    // 3. Body parsing and validation
     let body: unknown;
     try {
       body = await request.json();
@@ -52,12 +58,23 @@ export async function POST(request: NextRequest) {
 
     const { email, password } = parsed.data;
 
-    // 3. Connect to MongoDB
+    // 4. Persistent Email/Account rate limiting (max 5 login attempts per 15 minutes per account)
+    const emailBlocked = await enforceEmailRateLimit({
+      policy: "login",
+      email,
+      rateLimitExceededMessage:
+        "Too many login attempts. Please try again later.",
+    });
+    if (emailBlocked) {
+      return emailBlocked;
+    }
+
+    // 5. Connect to MongoDB
     let db;
     try {
       db = await getDb();
     } catch (dbErr) {
-      console.error("[login] Database connection error:", dbErr);
+      logger.error("auth_login_db_unavailable", { error: dbErr });
       return NextResponse.json(
         {
           error: "Database service unavailable. Please check system configuration.",
@@ -69,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const users = await getUsersCollection(db);
 
-    // 4. Find user by normalized email
+    // 6. Find user by normalized email
     const user = await users.findOne({ email });
     if (!user) {
       // Timing-safe response: generic invalid credentials message
@@ -79,7 +96,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Account status check
+    // 7. Account status check
     if (user.status === "suspended") {
       return NextResponse.json(
         {
@@ -90,7 +107,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 6. Verify password with Argon2id
+    // 8. Verify password with Argon2id
     const passwordMatch = await verifyPassword(user.passwordHash, password);
     if (!passwordMatch) {
       return NextResponse.json(
@@ -99,14 +116,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 7. Create database-backed session
+    // 9. Create database-backed session
     const userAgent = request.headers.get("user-agent") || undefined;
     const { token, expiresAt } = await createSession(db, user._id, {
       userAgent,
-      ipAddress: ip,
+      ipAddress: clientIp || undefined,
     });
 
-    // 8. Prepare safe response
+    // 10. Prepare safe response
     const response = NextResponse.json(
       {
         user: sanitizeUser(user),
@@ -115,12 +132,12 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
 
-    // 9. Set secure httpOnly session cookie
+    // 11. Set secure httpOnly session cookie
     setSessionCookie(response, token, expiresAt);
 
     return response;
   } catch (error) {
-    console.error("[login] Unexpected error:", error);
+    logger.error("auth_login_unexpected_error", { error });
     return NextResponse.json(
       { error: "Internal server error", code: "INTERNAL_ERROR" },
       { status: 500 }
