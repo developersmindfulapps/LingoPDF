@@ -157,11 +157,15 @@ export default function PrivacyPolicyPage() {
                   Support communications
                 </h3>
                 <p>
-                  If you contact{" "}
+                  If you submit an inquiry through our website contact form (
+                  <Link href="/support" className="text-[var(--color-forest-green)] underline">
+                    https://www.lingopdf.in/support
+                  </Link>
+                  ) or write to{" "}
                   <a href="mailto:support@lingopdf.in" className="text-[var(--color-forest-green)] underline">
                     support@lingopdf.in
                   </a>
-                  , we process your email address, message and any information you choose to provide so that we can respond.
+                  , we process your name, email address, subject, message contents, and optional browser information (if supplied) so that our support team can assist you and respond. We also process technical security and rate-limiting metadata (such as IP address digests and request timestamps) to prevent abuse and protect our systems.
                 </p>
               </div>
 
@@ -371,11 +375,10 @@ export default function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc pl-5 space-y-2">
                 <li>
-                  <strong>MongoDB Atlas:</strong> Account, authentication, session and application data storage.
+                  <strong>MongoDB Atlas:</strong> Account, authentication, session and application data storage, and rate-limiting persistence.
                 </li>
                 <li>
-                  <strong>Resend:</strong> Transactional email delivery, including verification and password-reset
-                  messages.
+                  <strong>Resend:</strong> Transactional email delivery, including account verification, password-reset links, and support contact form transmissions.
                 </li>
                 <li>
                   <strong>Vercel:</strong> Website hosting, application delivery and server-side execution.

@@ -318,3 +318,131 @@ support@lingopdf.in
 
   return { subject, html, text };
 }
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export function renderSupportContactEmail(params: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  browser?: string;
+  timestamp?: Date;
+}): EmailTemplateResult {
+  const { name, email, subject, message, browser, timestamp = new Date() } = params;
+  const emailSubject = `[LingoPDF Support] ${subject}`;
+  const formattedDate = timestamp.toUTCString();
+  const browserDisplay = browser?.trim() || "Not specified";
+
+  const text = `New Support Request from LingoPDF Website
+
+From: ${name} <${email}>
+Subject: ${subject}
+Browser: ${browserDisplay}
+Timestamp: ${formattedDate}
+
+--------------------------------------------------
+Message:
+--------------------------------------------------
+${message}
+--------------------------------------------------
+
+To reply directly to the customer, reply to this email (Reply-To: ${email}).
+`;
+
+  const safeName = escapeHtml(name);
+  const safeEmail = escapeHtml(email);
+  const safeSubject = escapeHtml(subject);
+  const safeBrowser = escapeHtml(browserDisplay);
+  const safeMessage = escapeHtml(message).replace(/\r?\n/g, "<br>");
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(emailSubject)}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F8F5EE; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #242923; line-height: 1.6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F5EE; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E8E4D9; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(25, 60, 50, 0.04);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #193C32; padding: 24px 32px; text-align: left;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td>
+                    <span style="font-size: 20px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.5px;">Lingo<span style="color: #D87854;">PDF</span></span>
+                    <span style="font-size: 13px; color: #E8E4D9; margin-left: 12px; font-weight: 500;">Support Desk</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Meta Box -->
+          <tr>
+            <td style="padding: 32px 32px 20px 32px;">
+              <h1 style="font-size: 20px; font-weight: 700; color: #193C32; margin: 0 0 20px 0; line-height: 1.3;">
+                New Contact Form Submission
+              </h1>
+
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F5EE; border: 1px solid #E8E4D9; border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 4px 0; font-size: 14px; color: #666666; width: 100px;"><strong>From:</strong></td>
+                  <td style="padding: 4px 0; font-size: 14px; color: #242923;">${safeName} &lt;<a href="mailto:${safeEmail}" style="color: #193C32; text-decoration: underline;">${safeEmail}</a>&gt;</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; font-size: 14px; color: #666666;"><strong>Subject:</strong></td>
+                  <td style="padding: 4px 0; font-size: 14px; color: #242923; font-weight: 600;">${safeSubject}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; font-size: 14px; color: #666666;"><strong>Browser:</strong></td>
+                  <td style="padding: 4px 0; font-size: 14px; color: #242923;">${safeBrowser}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 4px 0; font-size: 14px; color: #666666;"><strong>Received:</strong></td>
+                  <td style="padding: 4px 0; font-size: 14px; color: #242923;">${escapeHtml(formattedDate)}</td>
+                </tr>
+              </table>
+
+              <!-- Message Body -->
+              <h2 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #193C32; margin: 0 0 10px 0;">
+                Message Content
+              </h2>
+              <div style="background-color: #FFFFFF; border-left: 3px solid #D87854; border-top: 1px solid #E8E4D9; border-right: 1px solid #E8E4D9; border-bottom: 1px solid #E8E4D9; border-radius: 0 8px 8px 0; padding: 18px 20px; font-size: 15px; color: #242923; line-height: 1.6; word-break: break-word;">
+                ${safeMessage}
+              </div>
+
+              <p style="font-size: 13px; color: #666666; margin: 24px 0 0 0;">
+                Reply directly to this email to respond to <strong>${safeEmail}</strong>.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F8F5EE; padding: 18px 32px; border-top: 1px solid #E8E4D9; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #777777;">
+                LingoPDF Support Dispatch • <a href="https://www.lingopdf.in" style="color: #193C32; text-decoration: underline;">www.lingopdf.in</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject: emailSubject, html, text };
+}

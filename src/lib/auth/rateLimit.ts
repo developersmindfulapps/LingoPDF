@@ -71,6 +71,12 @@ export const RATE_LIMIT_POLICIES = {
     emailLimit: null,
     windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
   },
+  contact: {
+    scope: "contact",
+    ipLimit: 5,
+    emailLimit: 3,
+    windowSeconds: 60 * 60, // 1 hour (3600 seconds)
+  },
 } as const;
 
 export type RateLimitPolicyKey = keyof typeof RATE_LIMIT_POLICIES;

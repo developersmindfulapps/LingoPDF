@@ -3,6 +3,7 @@ import {
   renderVerificationEmail,
   renderPasswordResetEmail,
   renderReferralQuotaReachedEmail,
+  renderSupportContactEmail,
 } from "./templates";
 
 export interface SendEmailResult {
@@ -276,6 +277,94 @@ export async function sendReferralQuotaReachedEmail(params: {
 
     if (error) {
       const errMsg = error.message || "Failed to send referral quota notification";
+      return {
+        success: false,
+        accepted: false,
+        error: errMsg,
+        code: "RESEND_ERROR",
+      };
+    }
+
+    if (!data?.id) {
+      return {
+        success: false,
+        accepted: false,
+        error: "Resend did not return a message identifier",
+        code: "NO_MESSAGE_ID",
+      };
+    }
+
+    return {
+      success: true,
+      accepted: true,
+      messageId: data.id,
+    };
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : "Unknown email error";
+    return {
+      success: false,
+      accepted: false,
+      error: errMsg,
+      code: "NETWORK_ERROR",
+    };
+  }
+}
+
+/**
+ * Sends a support contact form submission to the designated support inbox.
+ * All customer messages are delivered to support@lingopdf.in with replyTo set to customer's email.
+ */
+export async function sendSupportContactEmail(params: {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+  browser?: string;
+  timestamp?: Date;
+}): Promise<SendEmailResult> {
+  const { name, email, subject, message, browser, timestamp = new Date() } = params;
+  const supportRecipient = process.env.SUPPORT_EMAIL || "support@lingopdf.in";
+  const template = renderSupportContactEmail({
+    name,
+    email,
+    subject,
+    message,
+    browser,
+    timestamp,
+  });
+  const { from } = getEmailConfig();
+
+  if (isMockEmailActive()) {
+    return {
+      success: true,
+      accepted: true,
+      messageId: `mock-contact-${Date.now()}`,
+      isMocked: true,
+    };
+  }
+
+  const { resend, error: clientError } = getResendClient();
+  if (!resend) {
+    return {
+      success: false,
+      accepted: false,
+      error: clientError || "Email client unavailable",
+      code: "EMAIL_NOT_CONFIGURED",
+    };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to: supportRecipient,
+      replyTo: email,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      const errMsg = error.message || "Failed to send support email";
       return {
         success: false,
         accepted: false,

@@ -101,6 +101,7 @@ export const siteConfig = {
     { label: "Products", href: "/#products" },
     { label: "How It Works", href: "/#how-it-works" },
     { label: "Pricing", href: "/#pricing" },
+    { label: "Support", href: "/support" },
     { label: "Privacy", href: "/privacy" },
   ],
 };

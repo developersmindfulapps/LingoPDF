@@ -51,9 +51,9 @@ export function Footer() {
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
-                <a href="mailto:support@lingopdf.in" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
-                  Help &amp; Inquiries
-                </a>
+                <Link href="/support" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  Support &amp; FAQ
+                </Link>
               </li>
               <li>
                 <a href="mailto:support@lingopdf.in" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
