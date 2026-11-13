@@ -4,6 +4,7 @@ import {
   renderPasswordResetEmail,
   renderReferralQuotaReachedEmail,
   renderSupportContactEmail,
+  renderPurchaseConfirmationEmail,
 } from "./templates";
 
 export interface SendEmailResult {
@@ -397,3 +398,92 @@ export async function sendSupportContactEmail(params: {
     };
   }
 }
+
+/**
+ * Sends a purchase confirmation and licence activation instructions email.
+ */
+export async function sendPurchaseConfirmationEmail(params: {
+  to: string;
+  name?: string;
+  orderId: string;
+  transactionId?: string;
+  amountFormatted: string;
+  productName?: string;
+}): Promise<SendEmailResult> {
+  const { to, name, orderId, transactionId, amountFormatted, productName } = params;
+  const baseUrl = getTrustedAppUrl();
+  const devicesUrl = `${baseUrl}/account/devices`;
+  const template = renderPurchaseConfirmationEmail({
+    name,
+    orderId,
+    transactionId,
+    amountFormatted,
+    productName,
+    devicesUrl,
+  });
+  const { from, replyTo } = getEmailConfig();
+
+  if (isMockEmailActive()) {
+    return {
+      success: true,
+      accepted: true,
+      messageId: `mock-purchase-${Date.now()}`,
+      isMocked: true,
+    };
+  }
+
+  const { resend, error: clientError } = getResendClient();
+  if (!resend) {
+    return {
+      success: false,
+      accepted: false,
+      error: clientError || "Email client unavailable",
+      code: "EMAIL_NOT_CONFIGURED",
+    };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      replyTo,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    if (error) {
+      const errMsg = error.message || "Failed to send purchase confirmation email";
+      return {
+        success: false,
+        accepted: false,
+        error: errMsg,
+        code: "RESEND_ERROR",
+      };
+    }
+
+    if (!data?.id) {
+      return {
+        success: false,
+        accepted: false,
+        error: "Resend did not return a message identifier",
+        code: "NO_MESSAGE_ID",
+      };
+    }
+
+    return {
+      success: true,
+      accepted: true,
+      messageId: data.id,
+    };
+  } catch (err: unknown) {
+    const errMsg = err instanceof Error ? err.message : "Unknown email error";
+    return {
+      success: false,
+      accepted: false,
+      error: errMsg,
+      code: "NETWORK_ERROR",
+    };
+  }
+}
+

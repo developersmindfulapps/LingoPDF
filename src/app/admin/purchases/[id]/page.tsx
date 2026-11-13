@@ -211,6 +211,12 @@ export default async function AdminPurchaseDetailPage({
             <span className="text-[#242923]/60">Provider Payment ID:</span>
             <AdminCopyId value={purchase.providerPaymentId} />
           </div>
+          {purchase.paddleTransactionId && (
+            <div className="flex justify-between">
+              <span className="text-[#242923]/60">Paddle Transaction ID:</span>
+              <AdminCopyId value={purchase.paddleTransactionId} />
+            </div>
+          )}
           <div className="flex justify-between">
             <span className="text-[#242923]/60">Idempotency Key:</span>
             <AdminCopyId value={purchase.idempotencyKey} />

@@ -59,7 +59,7 @@ export type UserRole = "customer" | "admin";
 
 export type SupportedCurrency = "INR" | "USD" | "EUR";
 export type PurchaseRegion = "IN" | "US" | "EU";
-export type PaymentProvider = "razorpay";
+export type PaymentProvider = "razorpay" | "paddle";
 
 export type PurchaseStatus =
   | "pending"
@@ -325,6 +325,10 @@ export interface PurchaseDocument {
   refundHistory?: PurchaseRefundRequest[];
   disputeRecord?: PurchaseDisputeRecord | null;
   disputeHistory?: PurchaseDisputeRecord[];
+  // Additive Stage 2 Paddle Sandbox metadata
+  paddleTransactionId?: string | null;
+  paddleCustomerId?: string | null;
+  paddleCheckoutUrl?: string | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -613,6 +617,7 @@ export interface PaymentWebhookDocument {
   lastError: string | null;
   receivedAt: Date;
   processedAt: Date | null;
+  leaseExpiresAt?: Date | null;
 }
 
 export interface AdminAuditLogDocument {

@@ -89,7 +89,7 @@ const objectIdSchema = z.custom<ObjectId>(
 
 export const supportedCurrencySchema = z.enum(["INR", "USD", "EUR"]);
 export const purchaseRegionSchema = z.enum(["IN", "US", "EU"]);
-export const paymentProviderSchema = z.enum(["razorpay"]);
+export const paymentProviderSchema = z.enum(["razorpay", "paddle"]);
 
 const nonNegativeSubunitsSchema = z
   .number()
@@ -170,6 +170,28 @@ export const purchaseCreateSchema = z
       .default("pending"),
     referrerUserId: objectIdSchema.nullable().default(null),
     referralProfileId: objectIdSchema.nullable().default(null),
+    paddleTransactionId: z
+      .string()
+      .trim()
+      .min(1)
+      .max(128)
+      .nullable()
+      .optional()
+      .default(null),
+    paddleCustomerId: z
+      .string()
+      .trim()
+      .min(1)
+      .max(128)
+      .nullable()
+      .optional()
+      .default(null),
+    paddleCheckoutUrl: z
+      .string()
+      .trim()
+      .nullable()
+      .optional()
+      .default(null),
   })
   .superRefine((data, ctx) => {
     // 1. Region <-> currency invariant check per Stage 3B.1
@@ -366,6 +388,9 @@ export function buildPurchaseDocument(
     refundedAt:
       d.status === "refunded" || d.status === "partially_refunded" ? now : null,
     disputedAt: d.status === "disputed" ? now : null,
+    paddleTransactionId: d.paddleTransactionId ?? null,
+    paddleCustomerId: d.paddleCustomerId ?? null,
+    paddleCheckoutUrl: d.paddleCheckoutUrl ?? null,
     createdAt: now,
     updatedAt: now,
   };
@@ -1323,6 +1348,7 @@ const MUTABLE_WEBHOOK_FIELDS = new Set([
   "attempts",
   "lastError",
   "processedAt",
+  "leaseExpiresAt",
 ]);
 
 export function assertImmutableWebhookFieldsNotModified(

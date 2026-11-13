@@ -778,6 +778,7 @@ export async function listAdminPurchases(
       paymentProvider: p.paymentProvider,
       providerOrderId: p.providerOrderId,
       providerPaymentId: p.providerPaymentId,
+      paddleTransactionId: p.paddleTransactionId || null,
       idempotencyKey: p.idempotencyKey,
       status: p.status,
       referrerUserId: p.referrerUserId ? p.referrerUserId.toString() : null,
@@ -874,6 +875,8 @@ export async function getAdminPurchaseDetails(db: Db, purchaseIdStr: string) {
       paymentProvider: purchase.paymentProvider,
       providerOrderId: purchase.providerOrderId,
       providerPaymentId: purchase.providerPaymentId,
+      paddleTransactionId: purchase.paddleTransactionId || null,
+      paddleCustomerId: purchase.paddleCustomerId || null,
       idempotencyKey: purchase.idempotencyKey,
       status: purchase.status,
       referrerUserId: purchase.referrerUserId

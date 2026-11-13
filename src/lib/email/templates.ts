@@ -446,3 +446,148 @@ To reply directly to the customer, reply to this email (Reply-To: ${email}).
 
   return { subject: emailSubject, html, text };
 }
+
+export function renderPurchaseConfirmationEmail(params: {
+  name?: string;
+  orderId: string;
+  transactionId?: string;
+  amountFormatted: string;
+  productName?: string;
+  devicesUrl: string;
+}): EmailTemplateResult {
+  const {
+    name,
+    orderId,
+    transactionId,
+    amountFormatted,
+    productName = "LingoPDF German → English Edition",
+    devicesUrl,
+  } = params;
+
+  const greeting = name ? `Hello ${escapeHtml(name)},` : "Hello,";
+  const subject = "Your LingoPDF Purchase Confirmation & Activation";
+
+  const text = `${name ? `Hello ${name},` : "Hello,"}
+
+Thank you for your purchase of ${productName}!
+
+Your order has been confirmed and your lifetime licence is now active.
+
+Order Details:
+- Product: ${productName}
+- Total Paid: ${amountFormatted}
+- Order Reference: ${orderId}
+${transactionId ? `- Payment Reference: ${transactionId}\n` : ""}- Licence: 1 Active Device (One-time lifetime purchase)
+
+Next Steps — Activate your Chrome Extension:
+1. Open the LingoPDF extension in Google Chrome.
+2. Go to your devices dashboard: ${devicesUrl}
+3. Click "Generate Activation Code" (valid for 10 minutes).
+4. Paste the activation code into your extension to bind your device.
+
+Need help? Contact support@lingopdf.in anytime.
+
+Best regards,
+The LingoPDF Team
+https://www.lingopdf.in
+`;
+
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${escapeHtml(subject)}</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F8F5EE; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #242923; line-height: 1.6;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #F8F5EE; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; background-color: #FFFFFF; border: 1px solid #E8E4D9; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);">
+          <!-- Header -->
+          <tr>
+            <td style="background-color: #193C32; padding: 32px; text-align: center;">
+              <h1 style="color: #FFFFFF; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.5px;">
+                LingoPDF
+              </h1>
+              <p style="color: #E8E4D9; font-size: 14px; margin: 6px 0 0 0;">
+                Purchase Confirmation & Licence Activation
+              </p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 32px;">
+              <p style="font-size: 16px; margin: 0 0 16px 0;">
+                ${greeting}
+              </p>
+              <p style="font-size: 15px; margin: 0 0 24px 0; color: #4A5568;">
+                Thank you for purchasing <strong>${escapeHtml(productName)}</strong>! Your payment has been confirmed and your lifetime licence is now active on your account.
+              </p>
+
+              <!-- Order Summary Card -->
+              <div style="background-color: #F8F5EE; border: 1px solid #E8E4D9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
+                <h3 style="font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #193C32; margin: 0 0 12px 0;">
+                  Order Summary
+                </h3>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td style="padding: 4px 0; font-size: 14px; color: #666666;">Product:</td>
+                    <td style="padding: 4px 0; font-size: 14px; font-weight: 600; text-align: right;">${escapeHtml(productName)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; font-size: 14px; color: #666666;">Total Paid:</td>
+                    <td style="padding: 4px 0; font-size: 14px; font-weight: 700; color: #193C32; text-align: right;">${escapeHtml(amountFormatted)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; font-size: 14px; color: #666666;">Order ID:</td>
+                    <td style="padding: 4px 0; font-size: 13px; font-family: monospace; text-align: right;">${escapeHtml(orderId)}</td>
+                  </tr>
+                  ${transactionId ? `<tr>
+                    <td style="padding: 4px 0; font-size: 14px; color: #666666;">Payment ID:</td>
+                    <td style="padding: 4px 0; font-size: 13px; font-family: monospace; text-align: right;">${escapeHtml(transactionId)}</td>
+                  </tr>` : ""}
+                  <tr>
+                    <td style="padding: 4px 0; font-size: 14px; color: #666666;">Licence Type:</td>
+                    <td style="padding: 4px 0; font-size: 14px; text-align: right;">Lifetime (1 Active Device)</td>
+                  </tr>
+                </table>
+              </div>
+
+              <!-- CTA Button -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 28px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="${escapeHtml(devicesUrl)}" style="display: inline-block; background-color: #D87854; color: #FFFFFF; font-size: 15px; font-weight: 600; text-decoration: none; padding: 14px 32px; border-radius: 8px; box-shadow: 0 2px 4px rgba(216, 120, 84, 0.3);">
+                      Activate Your Device
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 13px; color: #777777; margin: 24px 0 0 0; text-align: center;">
+                Need help activating? Reply to this email or contact <a href="mailto:support@lingopdf.in" style="color: #193C32;">support@lingopdf.in</a>.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #F8F5EE; padding: 20px 32px; border-top: 1px solid #E8E4D9; text-align: center;">
+              <p style="margin: 0; font-size: 12px; color: #777777;">
+                LingoPDF • German → English Vocabulary-Building PDF Reader<br>
+                <a href="https://www.lingopdf.in" style="color: #193C32; text-decoration: underline;">www.lingopdf.in</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+  return { subject, html, text };
+}
+

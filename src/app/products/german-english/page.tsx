@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/Button";
 import { ExtensionCtaButton } from "@/components/ExtensionCtaButton";
+import { PaddleCheckoutButton } from "@/components/PaddleCheckoutButton";
 import { PricingDisplay } from "@/components/PricingDisplay";
 import { PrivacyIllustration } from "@/components/PrivacyIllustration";
 import { FaqAccordion } from "@/components/FaqAccordion";
@@ -569,7 +570,8 @@ export default function GermanEnglishProductPage() {
                 </div>
               </div>
 
-              <ExtensionCtaButton label="Get the Extension" size="lg" fullWidth className="mb-4" />
+              <PaddleCheckoutButton label="Buy German Edition Licence" size="lg" fullWidth className="mb-3" />
+              <ExtensionCtaButton label="Get the Extension" size="md" variant="secondary" fullWidth className="mb-4" />
 
               <p className="text-xs text-[var(--color-charcoal)]/60 leading-relaxed font-sans">
                 Paid-only product. Each language edition is purchased separately. 3-day (72-hour) money-back guarantee.

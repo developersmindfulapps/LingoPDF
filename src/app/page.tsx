@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/Button";
 import { ExtensionCtaButton } from "@/components/ExtensionCtaButton";
+import { PaddleCheckoutButton } from "@/components/PaddleCheckoutButton";
 import { Badge } from "@/components/Badge";
 import { PricingDisplay } from "@/components/PricingDisplay";
 import { ProductCard } from "@/components/ProductCard";
@@ -257,7 +258,10 @@ export default function Home() {
                     />
                   </div>
 
-                  <ExtensionCtaButton label="Get Product" size="lg" className="w-full sm:w-auto" />
+                  <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <PaddleCheckoutButton label="Buy German Edition Licence" size="lg" className="w-full sm:w-auto" />
+                    <ExtensionCtaButton label="Get Product" variant="secondary" size="lg" className="w-full sm:w-auto" />
+                  </div>
                 </div>
               </div>
             </div>

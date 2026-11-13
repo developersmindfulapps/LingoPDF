@@ -125,7 +125,10 @@ export async function validateCustomerReferralCode(
     };
   }
 
-  const profile = await findActiveReferralProfileByCode(db, normalizedCode);
+  const referralProfilesCol = await getReferralProfilesCollection(db);
+  const profile = await referralProfilesCol.findOne({
+    referralCode: normalizedCode,
+  });
 
   if (!profile) {
     return {
@@ -150,6 +153,7 @@ export async function validateCustomerReferralCode(
 
   // Check capacity limit
   if (
+    profile.status === "exhausted" ||
     profile.successfulConversionsCount >= profile.maxReferralsCap ||
     profile.riskReviewRequired
   ) {
@@ -159,6 +163,16 @@ export async function validateCustomerReferralCode(
       discountPercent: 0,
       message: "This referral program slot has reached capacity.",
       error: "CAPACITY_REACHED",
+    };
+  }
+
+  if (profile.status !== "active") {
+    return {
+      valid: false,
+      code: normalizedCode,
+      discountPercent: 0,
+      message: "This referral code is not recognized or is no longer active.",
+      error: "CODE_NOT_FOUND",
     };
   }
 
@@ -450,6 +464,12 @@ export async function reserveReferralCapacityAtomically(
 
     if (!existing) {
       return { ok: false, reason: "referral_not_found" };
+    }
+    if (
+      existing.status === "exhausted" ||
+      existing.successfulConversionsCount >= existing.maxReferralsCap
+    ) {
+      return { ok: false, reason: "capacity_exhausted" };
     }
     if (existing.status !== "active") {
       return { ok: false, reason: "referral_inactive" };

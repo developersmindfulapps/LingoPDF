@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /**
  * LingoPDF — Paddle Sandbox Catalogue Seed Script (Stage 1)
  *

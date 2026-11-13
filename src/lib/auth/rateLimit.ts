@@ -107,6 +107,12 @@ export const RATE_LIMIT_POLICIES = {
     emailLimit: 10,
     windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
   },
+  checkoutSession: {
+    scope: "checkout-session",
+    ipLimit: 20,
+    emailLimit: 10,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
 } as const;
 
 export type RateLimitPolicyKey = keyof typeof RATE_LIMIT_POLICIES;
