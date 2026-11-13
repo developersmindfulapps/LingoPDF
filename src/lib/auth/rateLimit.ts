@@ -77,6 +77,36 @@ export const RATE_LIMIT_POLICIES = {
     emailLimit: 3,
     windowSeconds: 60 * 60, // 1 hour (3600 seconds)
   },
+  promoCodeRedemption: {
+    scope: "promo-code-redeem",
+    ipLimit: 10,
+    emailLimit: 5,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
+  activationCodeGeneration: {
+    scope: "act-code-gen",
+    ipLimit: 10,
+    emailLimit: 5,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
+  deviceActivation: {
+    scope: "dev-activate",
+    ipLimit: 15,
+    emailLimit: 10,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
+  licenceRenewal: {
+    scope: "lic-renew",
+    ipLimit: 60,
+    emailLimit: 30,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
+  deviceManagement: {
+    scope: "dev-manage",
+    ipLimit: 20,
+    emailLimit: 10,
+    windowSeconds: RATE_LIMIT_WINDOW_SECONDS,
+  },
 } as const;
 
 export type RateLimitPolicyKey = keyof typeof RATE_LIMIT_POLICIES;

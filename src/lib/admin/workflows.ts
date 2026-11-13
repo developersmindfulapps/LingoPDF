@@ -376,7 +376,7 @@ export async function revokeEntitlementByAdmin(
       previousStatus: ent.status,
       newStatus: "revoked",
       revocationReason,
-      purchaseId: ent.purchaseId.toString(),
+      purchaseId: ent.purchaseId ? ent.purchaseId.toString() : null,
     },
     operation: async () => {
       // Never delete historical entitlement documents; update status to "revoked"

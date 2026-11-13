@@ -1,0 +1,274 @@
+# LingoPDF — Licensing & Device Activation Architecture
+
+This document describes the cryptographic design, data models, state machines, API protocols, offline grace enforcement, and administrative procedures for the LingoPDF licensing and device activation system.
+
+---
+
+## 1. Executive Summary & Commercial Rules
+
+LingoPDF operates as a paid-only product for reading German texts with on-device vocabulary lookups and local OCR.
+
+### Fundamental Commercial Invariants
+1. **Paid-Only Model**: No permanent free tier, no daily lookup allowance (no 5 lookups/day), and no rolling time-based free trials.
+2. **Per-Edition Licensing**: A purchase or complimentary grant confers entitlement to a specific language edition (`german`).
+3. **One Active Device per Entitlement**: Exactly one active physical device binding (`maxActiveDevices: 1`) is permitted per entitlement at any given moment, enforced at both the service layer and database engine level.
+4. **Complimentary Grants**: Granted exclusively via 100% single-use promotional codes (`LINGO-GIFT-XXXX-XXXX`), producing zero fake purchases and zero referral commissions.
+5. **No External Payment Provider Dependencies**: Licensing and activation operate independently of payment gateway processors (Paddle, Razorpay, etc.).
+
+---
+
+## 2. Cryptographic Specifications
+
+### Asymmetric Signatures: Ed25519 (`lingopdf-ed25519-v1`)
+- **Server Role**: The Next.js backend holds the Ed25519 private key in PKCS#8 PEM format (`LICENCE_SIGNING_PRIVATE_KEY_PEM`) configured via environment variables. The server signs canonical JSON license leases.
+  - **Production Fail-Closed Invariant**: In production (`NODE_ENV === "production"`), missing, malformed, or non-Ed25519 private keys throw a fatal server-side configuration error. The server **never** generates or substitutes an ephemeral signing key in production. Ephemeral fallback keys are permitted exclusively in non-production local/test environments.
+- **Client Role**: The Chrome extension embeds the corresponding Ed25519 public key in SubjectPublicKeyInfo (SPKI) DER Base64 format (`TRUSTED_SERVER_PUBLIC_KEYS['lingopdf-ed25519-v1']`). The extension cryptographically verifies leases using the WebCrypto API (`crypto.subtle.verify`).
+- **Signature Algorithm**: Pure Ed25519 (RFC 8032 / Edwards-curve Digital Signature Algorithm).
+
+### Non-Extractable Device Identity (Proof-of-Possession)
+- The Chrome extension generates its own Ed25519 keypair inside the browser's WebCrypto subsystem with `extractable: false`.
+- The private key is persisted securely in IndexedDB (`lingopdf_device_keystore`) and cannot be accessed or extracted as raw key material by JavaScript code, DOM scripts, or extensions.
+- *Security Guarantee & Limitation*: Non-extractable WebCrypto keys prevent direct private-key extraction/export, but an attacker who achieves arbitrary script execution inside the extension context could still invoke the signing method while the context is active. Device authorization relies on cryptographic proof-of-possession of this keypair, not on client-supplied hardware fingerprints or MAC addresses.
+
+### Activation Codes: Entropy & Hashing
+- **Format**: `ACT-XXXX-XXXX-XXXX` (12 uppercase characters in 3 blocks of 4).
+- **Alphabet**: Unambiguous Crockford Base32 subset (`23456789ABCDEFGHJKLMNPQRSTUVWXYZ`), omitting easily confused glyphs (`0`, `O`, `1`, `I`).
+- **Entropy**: Exactly **60 independent random bits** derived from 64 CSPRNG bits (`crypto.randomBytes(8)`). With 12 Base32 characters ($12 \times 5 = 60$ bits), the search space is $2^{60} \approx 1.15 \times 10^{18}$ possibilities.
+- **Storage**: Plaintext codes are **never** stored in the database. The database stores only the SHA-256 hash (`codeHash`).
+- **Security Expiry**: Unused codes are redeemable for strictly **10 minutes** (`600` seconds) from generation (`expiresAt = createdAt + 10m`). After 10 minutes, the server strictly rejects activation attempts (`EXPIRED_CODE`) even while the document still exists in the database.
+- **Independent Database Cleanup**: Security validity (`expiresAt`) and database record cleanup (`cleanupAt = createdAt + 7d`) are completely decoupled. Unconsumed expired codes persist in MongoDB Atlas for up to 7 days for customer support diagnostics and audit trails before being purged by the MongoDB TTL index on `cleanupAt`.
+- **Permanent Consumed Code Audit Retention**: Codes are consumed atomically via MongoDB compare-and-swap (CAS) transactions. Upon consumption, the `cleanupAt` field is unset (`$unset: { cleanupAt: "" }`), guaranteeing MongoDB TTL cleanup can **never** delete consumed records. The security expiry timestamp `expiresAt` remains permanently on the document alongside `consumedAt`, `userId`, `entitlementId`, and `consumedByDeviceId`.
+
+---
+
+## 3. Database Schema & Collections
+
+Three dedicated collections in MongoDB Atlas (`lingo_pdf`) manage licensing:
+
+### 1. `activation_codes`
+Stores short-lived device activation tokens generated by authenticated customers.
+```typescript
+interface ActivationCodeDocument {
+  _id: ObjectId;
+  codeHash: string; // SHA-256 hex digest (Unique index)
+  codePrefix: string; // "ACT"
+  codeMasked: string; // "ACT-••••-••••-XXXX" (Safe for display/logs)
+  userId: ObjectId; // Bound customer account
+  userEmail: string;
+  entitlementId: ObjectId; // Bound language edition entitlement
+  productEdition: "german";
+  status: "active" | "consumed" | "expired" | "superseded";
+  createdAt: Date;
+  expiresAt: Date; // 10-minute security expiry (retained permanently for audit)
+  cleanupAt?: Date | null; // 7-day TTL cleanup for unconsumed codes; unset upon consumption
+  consumedAt: Date | null;
+  consumedByDeviceId: ObjectId | null;
+  updatedAt: Date;
+}
+```
+
+### 2. `device_bindings`
+Tracks physical device authorizations per entitlement.
+```typescript
+interface DeviceBindingDocument {
+  _id: ObjectId;
+  entitlementId: ObjectId;
+  userId: ObjectId;
+  userEmail: string;
+  productEdition: "german";
+  devicePublicKeySpki: string; // Base64 SPKI
+  devicePublicKeyHash: string; // SHA-256 of SPKI
+  deviceLabel: string; // Friendly name (e.g. "Chrome Extension on Windows")
+  clientVersion: string; // Extension release version
+  status: "active" | "suspended" | "revoked";
+  boundAt: Date;
+  lastValidatedAt: Date;
+  lastLeaseIssuedAt: Date;
+  currentLeaseId: string;
+  leaseExpiresAt: Date;
+  offlineGraceExpiresAt: Date;
+  revokedAt: Date | null;
+  revokedBy: string | null;
+  revocationReason: string | null;
+  suspendedAt: Date | null;
+  suspensionReason: string | null;
+  updatedAt: Date;
+}
+```
+> **Partial Unique Index**: `{ entitlementId: 1 }` with `{ partialFilterExpression: { status: "active" } }` enforces the strict **1 active device per entitlement** constraint at the database engine level.
+
+### 3. `licence_challenges`
+Provides single-use replay protection for periodic lease renewal.
+```typescript
+interface LicenceChallengeDocument {
+  _id: ObjectId;
+  challenge: string; // 32-byte secure hex string (Unique index)
+  deviceBindingId: ObjectId;
+  createdAt: Date;
+  expiresAt: Date; // 5-minute TTL index
+  consumedAt: Date | null;
+}
+```
+
+---
+
+## 4. Cryptographic Lease Format
+
+The server issues signed JSON leases canonicalized using RFC 8785 rules (alphabetically sorted keys, deterministic formatting):
+
+```json
+{
+  "keyId": "lingopdf-ed25519-v1",
+  "signature": "base64_raw_ed25519_signature_64_bytes...",
+  "payload": {
+    "deviceBindingId": "6af5a8ee5f5cadf22f35cc87",
+    "entitlementId": "6af5a8ec5f5cadf22f35cc84",
+    "issuedAt": 1794484462271,
+    "leaseExpiresAt": 1794570862271,
+    "leaseId": "6af5a8ee5f5cadf22f35cc88",
+    "licenceId": "6af5a8ec5f5cadf22f35cc84",
+    "licenceStatus": "active",
+    "offlineGraceExpiresAt": 1794743662271,
+    "productEdition": "german",
+    "protocolVersion": 1
+  }
+}
+```
+
+---
+
+## 5. End-to-End Activation & Renewal Flow
+
+```
++----------------+          +-------------------+          +----------------------+
+| Customer UI    |          | LingoPDF Website  |          | Chrome Extension     |
+| (/account/dev) |          | (Next.js Server)  |          | (Manifest V3)        |
++----------------+          +-------------------+          +----------------------+
+       |                              |                              |
+       | 1. Generate Activation Code  |                              |
+       |----------------------------->|                              |
+       |    (POST /api/licensing/     |                              |
+       |     activation-code)         |                              |
+       |                              |                              |
+       | 2. Plaintext Code Displayed  |                              |
+       |<-----------------------------|                              |
+       |    ("ACT-7K9W-P2MZ-994Q")    |                              |
+       |                              |                              |
+       | 3. User enters code          |                              |
+       |------------------------------------------------------------>|
+       |                              |                              |
+       |                              | 4. Generate local Ed25519    |
+       |                              |    keypair (non-extractable) |
+       |                              |    in WebCrypto / IndexedDB  |
+       |                              |                              |
+       |                              | 5. Submit activation request |
+       |                              |<-----------------------------|
+       |                              |    (POST /api/licensing/     |
+       |                              |     activate)                |
+       |                              |    - code                    |
+       |                              |    - devicePublicKeySpki     |
+       |                              |                              |
+       |                              | 6. Atomic CAS Validation:    |
+       |                              |    - SHA-256 match           |
+       |                              |    - Status active           |
+       |                              |    - 1-device check          |
+       |                              |    - Create device_binding   |
+       |                              |    - Sign lease with Ed25519 |
+       |                              |    - Unset code expiresAt    |
+       |                              |                              |
+       |                              | 7. Return signed lease       |
+       |                              |----------------------------->|
+       |                              |                              |
+       |                              | 8. Verify Ed25519 signature  |
+       |                              |    using pinned public key   |
+       |                              |    Store lease in storage    |
+       |                              |    UNLOCK EXTENSION FEATURES |
+       |                              |                              |
+```
+
+### Renewal Workflow (Challenge-Response Proof-of-Possession)
+When `leaseExpiresAt` approaches (background check initiates after 50% of the lease, i.e., past 12 hours):
+1. Extension requests a renewal challenge: `POST /api/licensing/challenge` with `{ deviceBindingId }`.
+2. Server verifies device binding is active and not revoked, generates a 32-byte cryptographic nonce, stores it in `licence_challenges` with a 5-minute TTL, and returns it.
+3. Extension signs the challenge nonce using its non-extractable device private key via WebCrypto.
+4. Extension submits: `POST /api/licensing/renew` with `{ deviceBindingId, challenge, signature }`.
+5. Server verifies:
+   - Challenge exists, belongs to this device, is not expired, and is unconsumed.
+   - Device binding and associated entitlement are active.
+   - Ed25519 signature of nonce verifies against stored `devicePublicKeySpki`.
+6. Server marks challenge consumed and returns an updated signed lease:
+   - `leaseExpiresAt = now + 24 hours`
+   - `offlineGraceExpiresAt = now + 72 hours`
+7. Extension cryptographically verifies the renewed lease, resets its monotonic clock baseline to `freshLease.payload.issuedAt`, and persists the lease.
+
+---
+
+## 6. Offline Grace Policy & Clock Tamper Detection
+
+### Concrete Timeline (Maximum 72 Hours Offline)
+The licensing system enforces a strict 72-hour ceiling from the last successful server validation:
+
+| Elapsed Time from Server Validation | Status | Behavior & UI State |
+| :--- | :--- | :--- |
+| **0 – 24 Hours** | `ACTIVE` | Normal uninterrupted reading. Background renewal attempts to silently refresh the lease if internet is available. |
+| **24 – 72 Hours** | `OFFLINE_GRACE` | Device is disconnected from internet. Reading, dictionary lookup, and OCR remain operational. An informational amber banner warns the user to reconnect online to renew. |
+| **Beyond 72 Hours** | `EXPIRED` | Hard lockout. All protected capabilities are blocked. Activation/renewal dialog is displayed. |
+
+### Monotonic Wall-Clock Rollback Detection & Recovery
+- **Rollback Detection**: The extension stores `lastMonotonicTimestamp`. If local time steps backward by more than 5 minutes (`now < lastMonotonicTimestamp - 300,000ms`), status transitions to `CLOCK_ROLLBACK_DETECTED` and locks features.
+- **Recovery Without `Math.max` Trap**: If a user's clock was temporarily set forward into the future and then corrected, renewal against the server cryptographically proves the real server time. Upon successful renewal, `lastMonotonicTimestamp` is reset directly to `freshLease.payload.issuedAt`, immediately clearing the skew and restoring `ACTIVE` status without trapping the user.
+
+---
+
+## 7. Protection Gates in Extension Services
+
+Protected capabilities are locked behind `licensingService.assertAuthorized(actionName)`:
+
+1. **PDF Document Loading (`src/services/pdfService.ts`)**:
+   ```typescript
+   public async loadDocument(data: File | ArrayBuffer): Promise<PDFDocumentProxy> {
+     licensingService.assertAuthorized('open PDF documents');
+     // ...
+   }
+   ```
+2. **Composite & Direct Dictionary Providers (`src/services/dictionary/`)**:
+   - `CompositeDictionaryProvider.ts`:
+     `licensingService.assertAuthorized('perform vocabulary lookups');`
+   - `LocalDictionaryProvider.ts`:
+     `licensingService.assertAuthorized('perform vocabulary lookups');` (Direct imports cannot bypass licensing).
+3. **Local OCR Processing (`src/services/ocr/ocrService.ts`)**:
+   ```typescript
+   public async recognize(imageSource: ImageLike, ...): Promise<OCRPageResult> {
+     licensingService.assertAuthorized('run OCR processing');
+     // ...
+   }
+   ```
+
+---
+
+## 8. Controlled Administrative Device Replacement Workflow
+
+If a customer changes laptops, reinstalls their operating system, or loses their device:
+1. Customer contacts support (`support@lingopdf.in`).
+2. An authorized administrator navigates to `/admin/devices`.
+3. Admin clicks **Replace Device** for the customer's entitlement.
+4. Server executes `replaceDeviceControlledWorkflow()`:
+   - Sets existing `device_binding.status` to `"revoked"`.
+   - Records `revocationReason` and `revokedBy`.
+   - Increments `deviceReplacementCount`.
+   - Clears `entitlement.activeInstallationIdHash`, `deviceBoundAt`, and `offlineLeaseExpiresAt`.
+   - Writes an immutable audit entry to `admin_audit_logs`.
+5. The customer's `/account/devices` portal immediately reflects 0 active devices and displays the **Generate Activation Code** button.
+6. The customer generates a new code and activates their new device.
+7. *Offline Revocation Reality*: Immediate server-side revocation prevents the old device from renewing (`renew()` returns 403 `DEVICE_REVOKED`). However, an offline device disconnected from the network cannot receive revocation signals and continues using its previously issued signed lease until the 24h lease / 72h offline grace ceiling expires.
+
+---
+
+## 9. Environment Variables Reference
+
+| Variable Name | Required | Description |
+| :--- | :--- | :--- |
+| `LICENCE_SIGNING_KEY_ID` | **Yes** | Key identifier embedded in lease headers (default: `lingopdf-ed25519-v1`). |
+| `LICENCE_SIGNING_PRIVATE_KEY_PEM` | **Yes (Prod)** | Server Ed25519 private key in PKCS#8 PEM format. Must be set and valid in production (fails closed). |
+| `NEXT_PUBLIC_APP_URL` | **Yes** | Canonical origin URL (used for CORS and extension communication). |
+| `RATE_LIMIT_HMAC_SECRET` | **Yes** | Secret for HMAC-SHA256 IP/email rate limit buckets. |

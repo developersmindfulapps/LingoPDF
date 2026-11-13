@@ -598,7 +598,7 @@ export async function getAdminUserDetails(db: Db, userIdStr: string) {
     })),
     entitlements: entitlements.map((e) => ({
       id: e._id.toString(),
-      purchaseId: e.purchaseId.toString(),
+      purchaseId: e.purchaseId ? e.purchaseId.toString() : null,
       productSlug: e.productSlug,
       status: e.status,
       activeRestrictionReasons: e.activeRestrictionReasons,
@@ -1058,7 +1058,7 @@ export async function listAdminEntitlements(
       id: e._id.toString(),
       userId: e.userId.toString(),
       userEmail: u?.email || "Unknown user",
-      purchaseId: e.purchaseId.toString(),
+      purchaseId: e.purchaseId ? e.purchaseId.toString() : null,
       productSlug: e.productSlug,
       status: e.status,
       activeRestrictionReasons: e.activeRestrictionReasons,
@@ -1184,7 +1184,9 @@ export async function listAdminRefunds(
 
   const userById = new Map(users.map((u) => [u._id.toString(), u]));
   const entByPurchaseId = new Map(
-    entitlements.map((e) => [e.purchaseId.toString(), e])
+    entitlements
+      .filter((e) => Boolean(e.purchaseId))
+      .map((e) => [e.purchaseId!.toString(), e])
   );
   const evByPurchaseId = new Map(
     evidences.map((ev) => [ev.purchaseId.toString(), ev])
@@ -1354,7 +1356,9 @@ export async function listAdminDisputes(
 
   const userById = new Map(users.map((u) => [u._id.toString(), u]));
   const entByPurchaseId = new Map(
-    entitlements.map((e) => [e.purchaseId.toString(), e])
+    entitlements
+      .filter((e) => Boolean(e.purchaseId))
+      .map((e) => [e.purchaseId!.toString(), e])
   );
   const commByPurchaseId = new Map(
     commissions.map((c) => [c.purchaseId.toString(), c])

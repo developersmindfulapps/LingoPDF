@@ -164,14 +164,20 @@ export default async function AdminEntitlementsPage({
                   <tr key={e.id} className="hover:bg-[#F8F5EE]/50">
                     <td className="py-3 pr-3">
                       <AdminCopyId value={e.id} />
-                      <div className="text-[11px] text-[#242923]/60 mt-0.5">
-                        Purchase:{" "}
-                        <AdminCopyId
-                          value={e.purchaseId}
-                          href={`/admin/purchases/${e.purchaseId}`}
-                          prefixChars={6}
-                        />
-                      </div>
+                      {e.purchaseId ? (
+                        <div className="text-[11px] text-[#242923]/60 mt-0.5">
+                          Purchase:{" "}
+                          <AdminCopyId
+                            value={e.purchaseId}
+                            href={`/admin/purchases/${e.purchaseId}`}
+                            prefixChars={6}
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-emerald-800 font-medium mt-0.5">
+                          Complimentary Promo Code
+                        </div>
+                      )}
                     </td>
                     <td className="py-3 px-3">
                       <Link

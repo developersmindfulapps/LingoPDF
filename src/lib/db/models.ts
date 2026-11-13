@@ -25,6 +25,10 @@ export const COLLECTION_NAMES = {
   adminAuditLogs: "admin_audit_logs",
   purchaseEvidence: "purchase_evidence",
   commissionAdjustments: "commission_adjustments",
+  promoCodes: "promo_codes",
+  activationCodes: "activation_codes",
+  deviceBindings: "device_bindings",
+  licenceChallenges: "licence_challenges",
 } as const;
 
 export type CollectionName =
@@ -328,7 +332,7 @@ export interface PurchaseDocument {
 export interface EntitlementDocument {
   _id: ObjectId;
   userId: ObjectId;
-  purchaseId: ObjectId;
+  purchaseId?: ObjectId | null;
   productSlug: string;
   status: EntitlementStatus;
   /**
@@ -348,8 +352,97 @@ export interface EntitlementDocument {
   deviceReplacementCount?: number;
   lastDeviceResetAt?: Date | null;
   lastDeviceResetReason?: string | null;
+  // Additive complimentary promotional grant metadata
+  source?: "purchase" | "complimentary_promo_code";
+  promoCodeId?: ObjectId | null;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export type PromoCodeStatus = "active" | "redeemed" | "expired" | "disabled";
+
+export interface PromoCodeDocument {
+  _id: ObjectId;
+  codeHash: string; // SHA-256 hash of normalized code, unique index
+  codeMasked: string; // Display-safe identifier, e.g. "LINGO-GIFT-••••-A1B2"
+  codePrefix: string; // Static prefix: "LINGO-GIFT"
+  label: string | null; // Optional human-readable recipient/campaign descriptor
+  productEdition: "german"; // Invariant: German → English edition
+  discountPercent: 100; // Invariant: exactly 100%
+  maxRedemptions: 1; // Invariant: exactly 1
+  status: PromoCodeStatus;
+  createdBy: ObjectId;
+  createdByEmail: string;
+  createdAt: Date;
+  expiresAt: Date | null;
+  redeemedBy: ObjectId | null;
+  redeemedByEmail: string | null;
+  redeemedAt: Date | null;
+  entitlementId: ObjectId | null;
+  disabledAt: Date | null;
+  disabledBy: ObjectId | null;
+  disableReason: string | null;
+  updatedAt: Date;
+}
+
+export type ActivationCodeStatus =
+  | "active"
+  | "consumed"
+  | "expired"
+  | "superseded";
+
+export interface ActivationCodeDocument {
+  _id: ObjectId;
+  codeHash: string; // SHA-256 hash of normalized code, unique index
+  codeMasked: string; // Display-safe identifier, e.g. "ACT-••••-A1B2"
+  codePrefix: string; // Static prefix: "ACT"
+  userId: ObjectId;
+  userEmail: string;
+  entitlementId: ObjectId;
+  productEdition: "german";
+  status: ActivationCodeStatus;
+  createdAt: Date;
+  expiresAt: Date; // Security validity expiry (strictly 10 minutes from generation; permanently retained for audit)
+  cleanupAt?: Date | null; // Database cleanup TTL timestamp (7 days for unconsumed codes; unset upon consumption so consumed codes are never purged)
+  consumedAt: Date | null;
+  consumedByDeviceId: ObjectId | null;
+  updatedAt: Date;
+}
+
+export type DeviceBindingStatus = "active" | "suspended" | "revoked";
+
+export interface DeviceBindingDocument {
+  _id: ObjectId;
+  entitlementId: ObjectId;
+  userId: ObjectId;
+  userEmail: string;
+  productEdition: "german";
+  devicePublicKeySpki: string; // Base64 DER SPKI (Ed25519)
+  devicePublicKeyHash: string; // SHA-256 hex digest of public key SPKI
+  deviceLabel: string; // e.g. "Chrome Extension on Windows"
+  clientVersion: string; // e.g. "0.1.0"
+  status: DeviceBindingStatus;
+  boundAt: Date;
+  lastValidatedAt: Date;
+  lastLeaseIssuedAt: Date;
+  currentLeaseId: string;
+  leaseExpiresAt: Date;
+  offlineGraceExpiresAt: Date;
+  revokedAt: Date | null;
+  revokedBy: string | null;
+  revocationReason: string | null;
+  suspendedAt: Date | null;
+  suspensionReason: string | null;
+  updatedAt: Date;
+}
+
+export interface LicenceChallengeDocument {
+  _id: ObjectId;
+  challenge: string; // 32-byte hex nonce, unique index
+  deviceBindingId: ObjectId;
+  createdAt: Date;
+  expiresAt: Date; // 5-minute TTL
+  consumedAt: Date | null;
 }
 
 export interface AffordabilityCountryRule {
@@ -680,6 +773,18 @@ export async function ensureIndexes(db: Db): Promise<ProvisionedIndexSummary[]> 
     db.collection<CommissionAdjustmentDocument>(
       COLLECTION_NAMES.commissionAdjustments
     );
+  const promoCodesCollection = db.collection<PromoCodeDocument>(
+    COLLECTION_NAMES.promoCodes
+  );
+  const activationCodesCollection = db.collection<ActivationCodeDocument>(
+    COLLECTION_NAMES.activationCodes
+  );
+  const deviceBindingsCollection = db.collection<DeviceBindingDocument>(
+    COLLECTION_NAMES.deviceBindings
+  );
+  const licenceChallengesCollection = db.collection<LicenceChallengeDocument>(
+    COLLECTION_NAMES.licenceChallenges
+  );
 
   const indexTasks: Array<{
     collection: CollectionName;
@@ -822,7 +927,7 @@ export async function ensureIndexes(db: Db): Promise<ProvisionedIndexSummary[]> 
         }),
     },
 
-    // 5. entitlements (4 indexes)
+    // 5. entitlements (5 indexes)
     // { userId: 1, productSlug: 1 } uses partialFilterExpression: { status: { $in: ["active", "suspended"] } }
     // so a user can never have duplicate active or suspended entitlements for the same edition, while
     // historical "revoked" entitlements are preserved if the user legitimately repurchases later.
@@ -832,7 +937,26 @@ export async function ensureIndexes(db: Db): Promise<ProvisionedIndexSummary[]> 
         createOrReconcileIndex(
           entitlementsCollection,
           { purchaseId: 1 },
-          { unique: true }
+          {
+            unique: true,
+            partialFilterExpression: {
+              purchaseId: { $type: "objectId" },
+            },
+          }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.entitlements,
+      run: () =>
+        createOrReconcileIndex(
+          entitlementsCollection,
+          { promoCodeId: 1 },
+          {
+            unique: true,
+            partialFilterExpression: {
+              promoCodeId: { $type: "objectId" },
+            },
+          }
         ),
     },
     {
@@ -1101,6 +1225,151 @@ export async function ensureIndexes(db: Db): Promise<ProvisionedIndexSummary[]> 
           purchaseId: 1,
         }),
     },
+
+    // 14. promo_codes (4 indexes)
+    {
+      collection: COLLECTION_NAMES.promoCodes,
+      run: () =>
+        createOrReconcileIndex(
+          promoCodesCollection,
+          { codeHash: 1 },
+          { unique: true }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.promoCodes,
+      run: () =>
+        createOrReconcileIndex(promoCodesCollection, {
+          status: 1,
+          createdAt: -1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.promoCodes,
+      run: () =>
+        createOrReconcileIndex(
+          promoCodesCollection,
+          { redeemedBy: 1 },
+          { sparse: true }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.promoCodes,
+      run: () =>
+        createOrReconcileIndex(
+          promoCodesCollection,
+          { expiresAt: 1 },
+          { sparse: true }
+        ),
+    },
+
+    // 15. activation_codes (5 indexes)
+    {
+      collection: COLLECTION_NAMES.activationCodes,
+      run: () =>
+        createOrReconcileIndex(
+          activationCodesCollection,
+          { codeHash: 1 },
+          { unique: true }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.activationCodes,
+      run: () =>
+        createOrReconcileIndex(activationCodesCollection, {
+          entitlementId: 1,
+          status: 1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.activationCodes,
+      run: () =>
+        createOrReconcileIndex(activationCodesCollection, {
+          userId: 1,
+          createdAt: -1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.activationCodes,
+      run: () =>
+        createOrReconcileIndex(activationCodesCollection, {
+          expiresAt: 1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.activationCodes,
+      run: () =>
+        createOrReconcileIndex(
+          activationCodesCollection,
+          { cleanupAt: 1 },
+          { expireAfterSeconds: 0, sparse: true }
+        ),
+    },
+
+    // 16. device_bindings (4 indexes)
+    {
+      collection: COLLECTION_NAMES.deviceBindings,
+      run: () =>
+        createOrReconcileIndex(
+          deviceBindingsCollection,
+          { entitlementId: 1 },
+          {
+            unique: true,
+            partialFilterExpression: { status: "active" },
+          }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.deviceBindings,
+      run: () =>
+        createOrReconcileIndex(deviceBindingsCollection, {
+          devicePublicKeyHash: 1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.deviceBindings,
+      run: () =>
+        createOrReconcileIndex(deviceBindingsCollection, {
+          userId: 1,
+          createdAt: -1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.deviceBindings,
+      run: () =>
+        createOrReconcileIndex(deviceBindingsCollection, {
+          status: 1,
+          lastValidatedAt: -1,
+        }),
+    },
+
+    // 17. licence_challenges (3 indexes)
+    {
+      collection: COLLECTION_NAMES.licenceChallenges,
+      run: () =>
+        createOrReconcileIndex(
+          licenceChallengesCollection,
+          { challenge: 1 },
+          { unique: true }
+        ),
+    },
+    {
+      collection: COLLECTION_NAMES.licenceChallenges,
+      run: () =>
+        createOrReconcileIndex(licenceChallengesCollection, {
+          deviceBindingId: 1,
+          expiresAt: 1,
+        }),
+    },
+    {
+      collection: COLLECTION_NAMES.licenceChallenges,
+      run: () =>
+        createOrReconcileIndex(
+          licenceChallengesCollection,
+          { expiresAt: 1 },
+          { expireAfterSeconds: 0 }
+        ),
+    },
   ];
 
   const resolvedNames: string[] = [];
@@ -1290,5 +1559,31 @@ export async function getCommissionAdjustmentsCollection(
 ): Promise<Collection<CommissionAdjustmentDocument>> {
   return db.collection<CommissionAdjustmentDocument>(
     COLLECTION_NAMES.commissionAdjustments
+  );
+}
+
+export async function getPromoCodesCollection(
+  db: Db
+): Promise<Collection<PromoCodeDocument>> {
+  return db.collection<PromoCodeDocument>(COLLECTION_NAMES.promoCodes);
+}
+
+export async function getActivationCodesCollection(
+  db: Db
+): Promise<Collection<ActivationCodeDocument>> {
+  return db.collection<ActivationCodeDocument>(COLLECTION_NAMES.activationCodes);
+}
+
+export async function getDeviceBindingsCollection(
+  db: Db
+): Promise<Collection<DeviceBindingDocument>> {
+  return db.collection<DeviceBindingDocument>(COLLECTION_NAMES.deviceBindings);
+}
+
+export async function getLicenceChallengesCollection(
+  db: Db
+): Promise<Collection<LicenceChallengeDocument>> {
+  return db.collection<LicenceChallengeDocument>(
+    COLLECTION_NAMES.licenceChallenges
   );
 }

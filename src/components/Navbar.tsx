@@ -87,6 +87,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             {!isLoadingSession && user ? (
               <div className="flex items-center gap-3">
+                <Link href="/account/devices" className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--color-soft-sage)]/50 text-[var(--color-forest-green)] hover:bg-[var(--color-forest-green)] hover:text-white transition-colors">Devices</Link>
                 <Link href="/account/referrals" className="text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--color-soft-sage)]/50 text-[var(--color-forest-green)] hover:bg-[var(--color-forest-green)] hover:text-white transition-colors">Referrals</Link>
                 <span className="text-sm font-medium text-[var(--color-charcoal)]/90 truncate max-w-[150px]">
                   {user.name || user.email.split("@")[0]}
@@ -150,7 +151,10 @@ export function Navbar() {
           <div className="pt-3 border-t border-[var(--color-soft-sage)] flex flex-col gap-2.5">
             {!isLoadingSession && user ? (
               <div className="flex flex-col gap-2 px-3 py-1">
-                <Link href="/account/referrals" onClick={() => setMobileMenuOpen(false)} className="text-xs font-semibold px-2.5 py-1.5 rounded-md bg-[var(--color-soft-sage)]/50 text-[var(--color-forest-green)] hover:bg-[var(--color-forest-green)] hover:text-white transition-colors inline-block text-center mb-1">🎁 Referral Rewards</Link>
+                <div className="flex gap-2">
+                  <Link href="/account/devices" onClick={() => setMobileMenuOpen(false)} className="flex-1 text-xs font-semibold px-2.5 py-1.5 rounded-md bg-[var(--color-soft-sage)]/50 text-[var(--color-forest-green)] hover:bg-[var(--color-forest-green)] hover:text-white transition-colors inline-block text-center mb-1">💻 Devices</Link>
+                  <Link href="/account/referrals" onClick={() => setMobileMenuOpen(false)} className="flex-1 text-xs font-semibold px-2.5 py-1.5 rounded-md bg-[var(--color-soft-sage)]/50 text-[var(--color-forest-green)] hover:bg-[var(--color-forest-green)] hover:text-white transition-colors inline-block text-center mb-1">🎁 Referrals</Link>
+                </div>
                 <span className="text-sm font-medium text-[var(--color-charcoal)]">
                   Signed in as <strong>{user.name || user.email}</strong>
                 </span>
