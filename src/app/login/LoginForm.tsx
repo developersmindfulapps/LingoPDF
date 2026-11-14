@@ -7,7 +7,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawCallback = searchParams.get("callbackUrl");
+  const rawCallback =
+    searchParams.get("callbackUrl") ||
+    searchParams.get("from") ||
+    searchParams.get("redirect");
 
   // Validate same-origin callbackUrl to prevent open redirects
   let callbackUrl = "/";

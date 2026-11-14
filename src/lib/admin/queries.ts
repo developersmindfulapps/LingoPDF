@@ -2214,7 +2214,10 @@ export async function getAdminSystemHealthData(db: Db) {
   }
 
   // Safely check environment configuration without ever exposing raw values or secrets
-  const rawHmac = process.env.RATE_LIMIT_HMAC_SECRET?.trim() || "";
+  const rawHmac =
+    process.env.RATE_LIMIT_HMAC_SECRET?.trim() ||
+    process.env.NEXT_PUBLIC_RATE_LIMIT_HMAC_SECRET?.trim() ||
+    "";
   const hmacValid =
     rawHmac.length >= MIN_HMAC_SECRET_LENGTH && new Set(rawHmac).size >= 8;
 

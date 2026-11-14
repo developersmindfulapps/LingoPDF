@@ -44,15 +44,25 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Support Column */}
+          {/* Support & Account Column */}
           <div className="space-y-3">
             <h4 className="font-heading text-xs font-bold uppercase tracking-wider text-[var(--color-forest-green)]">
-              Support
+              Support &amp; Account
             </h4>
             <ul className="space-y-2.5 text-sm">
               <li>
                 <Link href="/support" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
                   Support &amp; FAQ
+                </Link>
+              </li>
+              <li>
+                <Link href="/login" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  Sign In
+                </Link>
+              </li>
+              <li>
+                <Link href="/register" className="text-[var(--color-charcoal)]/80 hover:text-[var(--color-forest-green)] transition-colors">
+                  Create Account
                 </Link>
               </li>
               <li>

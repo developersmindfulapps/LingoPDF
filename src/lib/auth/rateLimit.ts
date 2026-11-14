@@ -386,8 +386,17 @@ export async function checkRateLimit(
  * - Fails closed with RateLimitBackendError (producing HTTP 503) if missing or invalid in production.
  */
 export function resolveRateLimitHmacSecret(): string {
-  const rawSecret = process.env.RATE_LIMIT_HMAC_SECRET?.trim() || "";
+  const standardSecret = process.env.RATE_LIMIT_HMAC_SECRET?.trim() || "";
+  const legacyPublicSecret = process.env.NEXT_PUBLIC_RATE_LIMIT_HMAC_SECRET?.trim() || "";
+  const rawSecret = standardSecret || legacyPublicSecret;
   const isProd = isProductionEnvironment();
+
+  if (!standardSecret && legacyPublicSecret) {
+    logger.warn("rate_limit_legacy_public_env_var_detected", {
+      message:
+        "NEXT_PUBLIC_RATE_LIMIT_HMAC_SECRET is deprecated and risks client-side exposure. Please migrate to RATE_LIMIT_HMAC_SECRET in your server environment variables and rotate the secret.",
+    });
+  }
 
   if (!rawSecret) {
     if (isProd) {

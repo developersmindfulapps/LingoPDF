@@ -111,21 +111,19 @@ async function runVerification() {
   console.log("  ✓ Homepage promotional preview banner & commercial framing verified");
 
   const navbarContent = fs.readFileSync(path.resolve(__dirname, "../src/components/Navbar.tsx"), "utf8");
-  assert.ok(!navbarContent.includes('href="/login">Sign In'), "Navbar must not show raw Sign In link for guests");
-  assert.ok(!navbarContent.includes('href="/register">Create Account'), "Navbar must not show raw Create Account link for guests");
-  console.log("  ✓ Navbar guest authentication links cleanly removed during preview");
+  assert.ok(navbarContent.includes('href="/login"'), "Navbar must show Sign In link for guests");
+  assert.ok(navbarContent.includes('href="/register"'), "Navbar must show Create Account link for guests");
+  console.log("  ✓ Navbar guest authentication links verified (Sign In & Create Account)");
 
   const loginPage = fs.readFileSync(path.resolve(__dirname, "../src/app/login/page.tsx"), "utf8");
-  assert.ok(loginPage.includes("Private Promotional Preview"), "Login page must display promotional preview notice");
-  assert.ok(loginPage.includes("support@lingopdf.in"), "Login page must direct testers to support");
-  assert.ok(!loginPage.includes("Loading..."), "Login page must not display infinite loading placeholder");
-  console.log("  ✓ /login notice card verified (no infinite loading placeholder)");
+  assert.ok(loginPage.includes("<LoginForm />"), "Login page must render LoginForm component");
+  assert.ok(!loginPage.includes("Private Promotional Preview"), "Login page must not display outdated preview block");
+  console.log("  ✓ /login page verified with functional LoginForm");
 
   const registerPage = fs.readFileSync(path.resolve(__dirname, "../src/app/register/page.tsx"), "utf8");
-  assert.ok(registerPage.includes("Private Promotional Preview"), "Register page must display promotional preview notice");
-  assert.ok(registerPage.includes("support@lingopdf.in"), "Register page must direct testers to support");
-  assert.ok(!registerPage.includes("Loading..."), "Register page must not display infinite loading placeholder");
-  console.log("  ✓ /register notice card verified (no infinite loading placeholder)");
+  assert.ok(registerPage.includes("<RegisterForm />"), "Register page must render RegisterForm component");
+  assert.ok(!registerPage.includes("Private Promotional Preview"), "Register page must not display outdated preview block");
+  console.log("  ✓ /register page verified with functional RegisterForm");
 
   const termsPage = fs.readFileSync(path.resolve(__dirname, "../src/app/terms/page.tsx"), "utf8");
   assert.ok(termsPage.includes("Invited participants are not required to purchase a licence"), "Terms must clarify invited testers are not required to purchase");
